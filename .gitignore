@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs
+/BDataGrid/bin/Debug/netcoreapp3.1
+/BDataGrid/obj
+/BDataGrid.Library/bin/Debug/netstandard2.0
+/BDataGrid.Library/obj

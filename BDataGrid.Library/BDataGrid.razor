@@ -1,0 +1,57 @@
+﻿@typeparam TData
+@inject IBDataGridStyle BDataGridStyle
+
+<table>
+
+    <thead class="@(BDataGridStyle.HeaderClass)">
+        <tr class="@(BDataGridStyle.HeaderRowClass)">
+            @foreach (var col in Builder.Columns)
+            {
+                <th style="@(col.Value.Width == null ? "" : "width: " + col.Value.Width)">@(col.Value.HeaderText ?? "Unknowned header")</th>
+            }
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @for (int i = 0; i < Datas.Count; ++i)
+        {
+            var item = Datas[i];
+            var rowInfo = Builder.RowInfos[i] ?? Builder.GlobalRowInfo;
+
+            <tr style="@(rowInfo.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(rowInfo.BackgroundColor.Value))"
+                class="@(rowInfo.Classes ?? "") @(BDataGridStyle.RowClass)">
+
+                @{
+                    int colspanToSkip = 1;
+                    foreach (var col in Builder.Columns)
+                    {
+                        if (colspanToSkip > 1)
+                        {
+                            --colspanToSkip;
+                            continue;
+                        }
+
+                        DataGridCellInfo<TData>? cellInfo = null;
+                        if (rowInfo.Cells != null)
+                            rowInfo.Cells.TryGetValue(col.Key, out cellInfo);
+
+                        colspanToSkip = cellInfo?.ColSpan ?? 1;
+
+                        <td colspan="@colspanToSkip.ToString()"
+                            style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value))"
+                            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "")">
+
+                            @((cellInfo?.FormatterString ?? col.Value.Formatter)(item))
+
+                        </td>
+                    }
+                }
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
