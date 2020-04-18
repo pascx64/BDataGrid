@@ -5,6 +5,8 @@
     <RazorLangVersion>3.0</RazorLangVersion>
     <LangVersion>8</LangVersion>
     <Nullable>Enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.3-alpha</Version>
   </PropertyGroup>
 
 

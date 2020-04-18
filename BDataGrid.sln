@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BDataGrid", "BDataGrid\BDataGrid.csproj", "{9ACAC3FA-53E8-4A40-8131-28FA2FDF0510}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BDataGrid.Library", "BDataGrid.Library\BDataGrid.Library.csproj", "{816AC451-737C-4230-ACB6-B10357C544BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BDataGrid.Library", "BDataGrid.Library\BDataGrid.Library.csproj", "{816AC451-737C-4230-ACB6-B10357C544BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{67A67E33-7C57-4F45-8D8E-9514E9D8524C}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
