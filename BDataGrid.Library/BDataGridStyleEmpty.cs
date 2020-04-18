@@ -15,5 +15,7 @@ namespace BDataGrid.Library
         public string HeaderClass { get; set; } = "";
 
         public string HeaderRowClass { get; set; } = "";
+
+        public string SelectedCell { get; set; } = "";
     }
 }

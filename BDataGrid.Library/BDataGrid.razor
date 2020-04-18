@@ -40,7 +40,7 @@
 
                         <td colspan="@colspanToSkip.ToString()"
                             style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value))"
-                            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "")">
+                            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(SelectedCell?.Item == item && SelectedCell.Col == col.Value ? BDataGridStyle.SelectedCell : "")">
 
                             @((cellInfo?.FormatterString ?? col.Value.Formatter)(item))
 

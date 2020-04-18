@@ -18,6 +18,12 @@ namespace BDataGrid.Library
         [Parameter]
         public Action<DataGridBuilder<TData>> Configure { get; set; }
 
+        [Parameter]
+        public EventCallback<DataGridSelectedCellInfo<TData>?> SelectedCellChanged { get; set; }
+
+        [Parameter]
+        public DataGridSelectedCellInfo<TData>? SelectedCell { get; set; }
+
         private DataGridBuilder<TData> Builder { get; set; }
 
         protected override async Task OnParametersSetAsync()
