@@ -41,19 +41,30 @@ namespace BDataGrid.Library
             return DataGridRowBuilder.Property(selector);
         }
 
-        public DataGridRowBuilder<TItem> If(Func<TItem, bool> condition)
+        public DataGridCellBuilder<TItem, TProperty> If(Func<TItem, bool> condition)
         {
-            return DataGridRowBuilder.If(condition);
+            var conditionalRowBuilder = DataGridRowBuilder.If(condition);
+
+            return conditionalRowBuilder.Property(Selector);
         }
 
-        public DataGridRowBuilder<TItem> ElseIf(Func<TItem, bool> condition)
+        public DataGridCellBuilder<TItem, TProperty> ElseIf(Func<TItem, bool> condition)
         {
-            return DataGridRowBuilder.ElseIf(condition);
+            var conditionalRowBuilder = DataGridRowBuilder.ElseIf(condition);
+
+            return conditionalRowBuilder.Property(Selector);
         }
 
-        public DataGridRowBuilder<TItem> Else()
+        public DataGridCellBuilder<TItem, TProperty> Else()
         {
-            return DataGridRowBuilder.Else();
+            var conditionalRowBuilder = DataGridRowBuilder.Else();
+
+            return conditionalRowBuilder.Property(Selector);
+        }
+
+        public DataGridRowBuilder<TItem> EndIf()
+        {
+            return DataGridRowBuilder.EndIf();
         }
 
         public DataGridRowBuilder<TItem> Row()

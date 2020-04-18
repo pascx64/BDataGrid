@@ -13,6 +13,10 @@ namespace BDataGrid.Library
 
         internal Dictionary<string, DataGridColInfo<TItem>> Columns = new Dictionary<string, DataGridColInfo<TItem>>();
 
+        public DataGridBuilder() : base(null)
+        {
+        }
+
         public void Build(IReadOnlyList<TItem> items)
         {
             RowInfos.Clear();

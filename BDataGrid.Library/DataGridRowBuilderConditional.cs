@@ -8,7 +8,7 @@ namespace BDataGrid.Library
         private Func<TItem, bool> Condition { get; set; }
         public DataGridRowBuilder<TItem>? Alternative { get; set; }
 
-        public DataGridRowBuilderConditional(Func<TItem, bool> condition) : base()
+        public DataGridRowBuilderConditional(DataGridRowBuilder<TItem> lastFlow, Func<TItem, bool> condition) : base(lastFlow)
         {
             Condition = condition;
         }
@@ -19,8 +19,27 @@ namespace BDataGrid.Library
                 return ExecuteActions(rowInfo, item);
             else if (Alternative != null)
                 return Alternative.ExecuteActions(rowInfo, item);
+
             return false;
         }
 
+        public override DataGridRowBuilder<TItem> ElseIf(Func<TItem, bool> condition)
+        {
+            var builder = new DataGridRowBuilderConditional<TItem>(LastFlow, condition);
+            Alternative = builder;
+
+            return builder;
+        }
+        public override DataGridRowBuilder<TItem> Else()
+        {
+            Alternative = new DataGridRowBuilder<TItem>(LastFlow);
+
+            return Alternative;
+        }
+
+        public override DataGridRowBuilder<TItem> EndIf()
+        {
+            return LastFlow;
+        }
     }
 }

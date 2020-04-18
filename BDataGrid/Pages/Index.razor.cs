@@ -1,4 +1,5 @@
 ﻿using BDataGrid.Library;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BDataGrid.Example.Pages
 {
-    public partial class Index
+    public partial class Index: ComponentBase
     {
         public class DataItem
         {
@@ -34,14 +35,26 @@ namespace BDataGrid.Example.Pages
                     .HasHeaderText("Value");
 
             builder
-                .If(item => item.IsGroup)
-                    .HasBackgroundColor(System.Drawing.Color.Gray)
+                .If(item => !item.IsGroup)
+                    .Property(p => p.Value)
+                        .Formatter(item => item.Value + "$")
+                .Else()
+                    .HasClass("active bold")
                     .Property(p => p.Description)
                         .HasColSpan(2)
-                .Else()
-                    .HasBackgroundColor(System.Drawing.Color.Green)
+                .EndIf()
+                .If(item => item.Value % 2 == 0)
                     .Property(p => p.Value)
-                        .Formatter(item => item.Value + "$");
+                        .If(item => item.Value == 4)
+                            .HasClass("positive")
+                        .Else()
+                            .HasBackgroundColor("#fcd1d1") // error/red color
+                        .EndIf()
+                    .Property(p => p.Description)
+                        .HasClass("warning")
+                .Else()
+                    .Property(p => p.Description)
+                        .HasClass("positive");
         }
 
         protected override async Task OnInitializedAsync()
@@ -92,6 +105,36 @@ namespace BDataGrid.Example.Pages
                     Name = "sub item 3",
                     Description = "sadadawd",
                     Value = 5
+                },
+                new DataItem()
+                {
+                    Name = "sub item 2",
+                    Description = "sadadawd",
+                    Value = 6
+                },
+                new DataItem()
+                {
+                    IsGroup = true,
+                    Name = "group 3",
+                    Description = "Group de fou adwad",
+                },
+                new DataItem()
+                {
+                    Name = "sub item 1",
+                    Description = "wouhouuu here here here",
+                    Value = 7
+                },
+                new DataItem()
+                {
+                    Name = "sub item 2",
+                    Description = "sadadawd",
+                    Value = 8
+                },
+                new DataItem()
+                {
+                    Name = "sub item 3",
+                    Description = "sadadawd",
+                    Value = 9
                 }
             };
         }

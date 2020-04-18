@@ -7,6 +7,12 @@ namespace BDataGrid.Library
     public class DataGridRowBuilder<TItem>
        where TItem : class
     {
+        protected DataGridRowBuilder<TItem> LastFlow { get; }
+
+        public DataGridRowBuilder(DataGridRowBuilder<TItem>? lastFlow)
+        {
+            LastFlow = lastFlow ?? this;
+        }
         #region constructor and generic methods
 
         protected Queue<KeyValuePair<Action<DataGridRowInfo<TItem>>?, Func<DataGridRowInfo<TItem>, TItem, bool>?>> Actions { get; } = new Queue<KeyValuePair<Action<DataGridRowInfo<TItem>>?, Func<DataGridRowInfo<TItem>, TItem, bool>?>>();
@@ -49,27 +55,28 @@ namespace BDataGrid.Library
             return cellBuilder;
         }
 
-        public DataGridRowBuilder<TItem> If(Func<TItem, bool> condition)
+        public virtual DataGridRowBuilder<TItem> If(Func<TItem, bool> condition)
         {
-            var conditional = new DataGridRowBuilderConditional<TItem>(condition);
+            var conditional = new DataGridRowBuilderConditional<TItem>(this, condition);
 
             AddAction(conditional.ExecuteConditional);
 
             return conditional;
         }
 
-        public DataGridRowBuilder<TItem> ElseIf(Func<TItem, bool> condition)
+        public virtual DataGridRowBuilder<TItem> ElseIf(Func<TItem, bool> condition)
         {
-            var currentConditional = this as DataGridRowBuilderConditional<TItem> ?? throw new InvalidCastException("No condition");
-            var builder = new DataGridRowBuilderConditional<TItem>(condition);
-            currentConditional.Alternative = builder;
-            return builder;
+            throw new InvalidCastException("No condition");
         }
 
-        public DataGridRowBuilder<TItem> Else()
+        public virtual DataGridRowBuilder<TItem> Else()
         {
-            var currentConditional = this as DataGridRowBuilderConditional<TItem> ?? throw new InvalidCastException("No condition");
-            return currentConditional.Alternative = new DataGridRowBuilder<TItem>();
+            throw new InvalidCastException("No condition");
+        }
+
+        public virtual DataGridRowBuilder<TItem> EndIf()
+        {
+            return LastFlow;
         }
 
         public DataGridRowBuilder<TItem> HasBackgroundColor(System.Drawing.Color color)
@@ -92,7 +99,7 @@ namespace BDataGrid.Library
             return this;
         }
 
-        public DataGridRowBuilder<TItem> HasClass(string classes, bool overrideExisting)
+        public DataGridRowBuilder<TItem> HasClass(string classes, bool overrideExisting = false)
         {
             AddAction(rowInfo => rowInfo.Classes = overrideExisting ? classes : (rowInfo.Classes ?? "") + " " + classes);
 
