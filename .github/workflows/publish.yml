@@ -2,7 +2,8 @@ name: publish to nuget
 on:
   push:
     tags: 
-      - v1
+      - v1.*.*
+      - v1.*.*-*
 jobs:
   publish:
     name: list on nuget
