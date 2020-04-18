@@ -9,9 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BDataGrid.Data;
 
-namespace BDataGrid
+namespace BDataGrid.Example
 {
     public class Startup
     {
@@ -28,8 +27,7 @@ namespace BDataGrid
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
-            services.AddSingleton<Library.IBDataGridStyle>(new Library.BDataGridStyleEmpty());
+            services.AddSingleton<Library.IBDataGridStyle>(new Semantic.UI.SemanticStyle());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

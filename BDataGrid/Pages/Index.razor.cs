@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BDataGrid.Pages
+namespace BDataGrid.Example.Pages
 {
     public partial class Index
     {

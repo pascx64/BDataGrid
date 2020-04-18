@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BDataGrid", "BDataGrid\BDataGrid.csproj", "{9ACAC3FA-53E8-4A40-8131-28FA2FDF0510}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BDataGrid.Example", "BDataGrid\BDataGrid.Example.csproj", "{9ACAC3FA-53E8-4A40-8131-28FA2FDF0510}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BDataGrid.Library", "BDataGrid.Library\BDataGrid.Library.csproj", "{816AC451-737C-4230-ACB6-B10357C544BB}"
 EndProject
