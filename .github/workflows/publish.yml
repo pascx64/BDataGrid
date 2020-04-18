@@ -1,9 +1,9 @@
 name: publish to nuget
+# Trigger the workflow on pull request activity
 on:
-  push:
-    tags: 
-      - v1.*.*
-      - v1.*.*-*
+  release:
+    # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+    types: [published]
 jobs:
   publish:
     name: list on nuget
