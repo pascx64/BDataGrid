@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace BDataGrid.Library
 {
-    public class DataGridCellBuilder<TItem, TProperty> 
+    public class DataGridCellBuilder<TItem, TProperty>
         where TItem : class
     {
         protected Expression<Func<TItem, TProperty>> Selector { get; set; }
@@ -18,7 +18,7 @@ namespace BDataGrid.Library
             DataGridRowBuilder = dataGridRowBuilder;
         }
         private readonly Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>> Actions = new Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>>();
-        
+
         public DataGridCellBuilder<TItem, TProperty> AddAction(Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>> action)
         {
             Actions.Enqueue(action);
@@ -29,7 +29,8 @@ namespace BDataGrid.Library
             if (rowInfo.Cells == null)
                 rowInfo.Cells = new Dictionary<string, DataGridCellInfo<TItem>>();
 
-            var cellInfo = rowInfo.Cells[PropertyName] = new DataGridCellInfo<TItem>();
+            if (!rowInfo.Cells.TryGetValue(PropertyName, out var cellInfo))
+                cellInfo = rowInfo.Cells[PropertyName] = new DataGridCellInfo<TItem>();
 
             foreach (var action in Actions)
                 action(rowInfo, cellInfo);
@@ -65,23 +66,31 @@ namespace BDataGrid.Library
             return AddAction((row, cell) => cell.ColSpan = colspan);
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasClass(string classes)
+        public DataGridCellBuilder<TItem, TProperty> HasClass(string classes, bool overrideExisting = true)
         {
-            return AddAction((row, cell) => cell.Classes = classes);
+            return AddAction((row, cell) => cell.Classes = overrideExisting ? classes : ((cell.Classes ?? "") + " " + classes).Trim());
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
         {
             return AddAction((row, cell) => cell.BackgroundColor = color);
         }
+
+        public DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(string htmlColor)
+        {
+            return AddAction((row, cell) => cell.BackgroundColor = System.Drawing.ColorTranslator.FromHtml(htmlColor));
+        }
+
         public DataGridCellBuilder<TItem, TProperty> IsReadOnly()
         {
             return AddAction((row, cell) => cell.IsReadOnly = true);
         }
+
         public DataGridCellBuilder<TItem, TProperty> ReplaceWith(string content = "")
         {
             return AddAction((row, cell) => cell.FormatterString = item2 => content);
         }
+
         public DataGridCellBuilder<TItem, TProperty> Formatter(Func<TItem, string> formatter)
         {
             return AddAction((row, cell) => cell.FormatterString = formatter);

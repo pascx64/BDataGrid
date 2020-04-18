@@ -79,6 +79,13 @@ namespace BDataGrid.Library
             return this;
         }
 
+        public DataGridRowBuilder<TItem> HasBackgroundColor(string htmlColor)
+        {
+            AddAction(rowInfo => rowInfo.BackgroundColor = System.Drawing.ColorTranslator.FromHtml(htmlColor));
+
+            return this;
+        }
+
         public DataGridRowBuilder<TItem> IsReadOnly(bool value = true)
         {
             AddAction(rowInfo => rowInfo.IsReadOnly = value);
