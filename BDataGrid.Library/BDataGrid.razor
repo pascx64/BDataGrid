@@ -1,22 +1,25 @@
-﻿@typeparam TData
+﻿@typeparam TItem
 @inject IBDataGridStyle BDataGridStyle
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
-<table class="@(BDataGridStyle.TableClass)">
+<table @ref="TableRef" class="@(BDataGridStyle.TableClass)">
 
     <thead class="@(BDataGridStyle.HeaderClass)">
         <tr class="@(BDataGridStyle.HeaderRowClass)">
             @foreach (var col in Builder.Columns)
             {
-                <th style="@(col.Value.Width == null ? "" : "width: " + col.Value.Width)">@(col.Value.HeaderText ?? "Unknowned header")</th>
+                <th style="@(col.Value.Width == null ? "" : "width: " + col.Value.Width)">
+                    @(col.Value.HeaderText ?? "Unknowned header")
+                </th>
             }
         </tr>
     </thead>
 
     <tbody>
 
-        @for (int i = 0; i < Datas.Count; ++i)
+        @for (int i = 0; i < Items.Count; ++i)
         {
-            var item = Datas[i];
+            var item = Items[i];
             var rowInfo = Builder.RowInfos[i] ?? Builder.GlobalRowInfo;
 
             <tr style="@(rowInfo.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(rowInfo.BackgroundColor.Value))"
@@ -32,15 +35,16 @@
                             continue;
                         }
 
-                        DataGridCellInfo<TData>? cellInfo = null;
+                        DataGridCellInfo<TItem>? cellInfo = null;
                         if (rowInfo.Cells != null)
                             rowInfo.Cells.TryGetValue(col.Key, out cellInfo);
 
                         colspanToSkip = cellInfo?.ColSpan ?? 1;
 
-                        <td colspan="@colspanToSkip.ToString()"
+                        <td tabindex="0" colspan="@colspanToSkip.ToString()"
                             style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value))"
-                            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(SelectedCell?.Item == item && SelectedCell.Col == col.Value ? BDataGridStyle.SelectedCell : "")">
+                            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(SelectedCell?.Item == item && SelectedCell.Col == col.Value ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
+                            @onclick="() => SelectedCellFromClient(item, col.Value)">
 
                             @((cellInfo?.FormatterString ?? col.Value.Formatter)(item))
 

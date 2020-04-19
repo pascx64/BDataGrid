@@ -40,6 +40,7 @@ namespace BDataGrid.Library
                 var selector = Selector.Compile();
                 colInfo = GridBuilder.Columns[PropertyName] = new DataGridColInfo<TItem>()
                 {
+                    Id = PropertyName,
                     ValueSelector = x => selector(x),
                     Formatter = x => selector(x)?.ToString() ?? ""
                 };
