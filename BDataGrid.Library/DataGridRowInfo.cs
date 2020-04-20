@@ -3,6 +3,12 @@ using System.Linq;
 
 namespace BDataGrid.Library
 {
+    public enum RowLocation
+    {
+        Header,
+        Body,
+        Footer
+    }
     public class DataGridRowInfo<TItem>
         where TItem: class
     {
@@ -11,6 +17,8 @@ namespace BDataGrid.Library
         public string? Classes { get; set; }
 
         public bool? IsReadOnly { get; set; }
+
+        public RowLocation? RowLocation { get; set; }
 
         public Dictionary<string, DataGridCellInfo<TItem>>? Cells { get; set; }
 

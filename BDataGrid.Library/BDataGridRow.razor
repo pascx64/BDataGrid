@@ -1,0 +1,57 @@
+﻿@typeparam TItem
+@inject IBDataGridStyle BDataGridStyle;
+
+<tr style="@(RowInfo.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(RowInfo.BackgroundColor.Value))"
+    class="@(RowInfo.Classes ?? "") @(BDataGridStyle.RowClass)">
+
+    @{
+        int colspanToSkip = 1;
+        foreach (var col in DataGrid.Builder.Columns)
+        {
+            if (colspanToSkip > 1)
+            {
+                --colspanToSkip;
+                continue;
+            }
+
+            DataGridCellInfo<TItem>? cellInfo = null;
+            if (RowInfo.Cells != null)
+                RowInfo.Cells.TryGetValue(col.Key, out cellInfo);
+
+            colspanToSkip = cellInfo?.ColSpan ?? 1;
+
+            var isSelectedCell = DataGrid.SelectedCell?.Col == col.Value && DataGrid.SelectedCell?.Item == Item;
+
+            <td tabindex="0" colspan="@colspanToSkip.ToString()"
+                style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value))"
+                class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
+                @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
+                @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
+
+                @if (isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null)
+                {
+                    @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);
+                }
+                else
+                {
+                    @((cellInfo?.FormatterString ?? col.Value.Formatter)(Item))@(cellInfo?.Append ?? col.Value.Append ?? "")
+                }
+
+            </td>
+        }
+    }
+
+</tr>
+
+@code {
+
+    [Parameter]
+    public DataGridRowInfo<TItem> RowInfo { get; set; }
+
+    [Parameter]
+    public BDataGrid<TItem> DataGrid { get; set; }
+
+    [Parameter]
+    public TItem Item { get; set; }
+
+}

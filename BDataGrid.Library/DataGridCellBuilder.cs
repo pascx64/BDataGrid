@@ -50,7 +50,7 @@ namespace BDataGrid.Library
         }
         public DataGridRowBuilder<TItem> IfRow(Func<TItem, bool> condition)
         {
-           return DataGridRowBuilder.If(condition);
+            return DataGridRowBuilder.If(condition);
         }
 
         public DataGridRowBuilder<TItem> ElseIfRow(Func<TItem, bool> condition)
@@ -176,6 +176,11 @@ namespace BDataGrid.Library
         public DataGridCellBuilder<TItem, TProperty> HasTextEditor()
         {
             return HasEditor<Editors.BDataGridEditor_Text>();
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasAppendedText(string append)
+        {
+            return AddAction((row, cell) => cell.Append = append);
         }
     }
 }

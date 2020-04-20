@@ -8,7 +8,7 @@ namespace BDataGrid.Library
         private Func<TItem, bool> Condition { get; set; }
         public DataGridRowBuilder<TItem>? Alternative { get; set; }
 
-        public DataGridRowBuilderConditional(DataGridRowBuilder<TItem> lastFlow, Func<TItem, bool> condition) : base(lastFlow)
+        public DataGridRowBuilderConditional(DataGridRowBuilder<TItem> lastFlow, Func<TItem, bool> condition) : base(lastFlow.DataGridBuilder, lastFlow)
         {
             Condition = condition;
         }
@@ -32,7 +32,7 @@ namespace BDataGrid.Library
         }
         public override DataGridRowBuilder<TItem> Else()
         {
-            Alternative = new DataGridRowBuilder<TItem>(LastFlow);
+            Alternative = new DataGridRowBuilder<TItem>(LastFlow.DataGridBuilder, LastFlow);
 
             return Alternative;
         }

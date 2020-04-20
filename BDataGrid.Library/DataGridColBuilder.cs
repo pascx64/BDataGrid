@@ -63,5 +63,10 @@ namespace BDataGrid.Library
         {
             return AddAction(c => c.HeaderText = text);
         }
+
+        public new DataGridColBuilder<TItem, TProperty> HasAppendedText(string text)
+        {
+            return AddAction(c => c.Append = text);
+        }
     }
 }

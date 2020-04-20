@@ -13,12 +13,18 @@ namespace BDataGrid.Library
 
         internal Dictionary<string, DataGridColInfo<TItem>> Columns = new Dictionary<string, DataGridColInfo<TItem>>();
 
-        public DataGridBuilder() : base(null)
+        public DataGridBuilder() : base(null, null)
         {
         }
 
+        public IReadOnlyList<TItem> Items { get; private set; }
+        public IReadOnlyList<(int Index, TItem Item)> FilteredItems { get; private set; }
+        public IReadOnlyList<(int Index, TItem Item)> HeaderItems { get; private set; }
+        public IReadOnlyList<(int Index, TItem Item)> FooterItems { get; private set; }
+
         public void Build(IReadOnlyList<TItem> items)
         {
+            Items = items;
             RowInfos.Clear();
             RowInfos.Capacity = items.Count;
             Columns.Clear();
@@ -27,17 +33,39 @@ namespace BDataGrid.Library
             foreach (var action in GlobalActions)
                 action(GlobalRowInfo);
 
+            var filteredItems = new List<(int Index, TItem item)>(items.Count);
+            var headerItems = new List<(int Index, TItem item)>(3);
+            var footerItems = new List<(int Index, TItem item)>(3);
+
             var cacheRowInfo = GlobalRowInfo.Clone();
-            foreach (var item in items)
+            for (int i = 0; i < items.Count; ++i)
             {
+                var item = items[i];
                 if (ExecuteActions(cacheRowInfo, item))
                 {
                     RowInfos.Add(cacheRowInfo);
+
+                    var location = cacheRowInfo.RowLocation ?? RowLocation.Body;
+                    if (location == RowLocation.Body)
+                        filteredItems.Add((i, item));
+                    else if (location == RowLocation.Footer)
+                        footerItems.Add((i, item));
+                    else if (location == RowLocation.Header)
+                        headerItems.Add((i, item));
+
                     cacheRowInfo = GlobalRowInfo.Clone();
                 }
                 else
+                {
                     RowInfos.Add(null);
+
+                    filteredItems.Add((i, item));
+                }
             }
+
+            FilteredItems = filteredItems;
+            HeaderItems = headerItems;
+            FooterItems = footerItems;
         }
 
         public override void AddAction(Action<DataGridRowInfo<TItem>> action)

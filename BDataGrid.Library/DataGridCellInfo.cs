@@ -15,6 +15,8 @@ namespace BDataGrid.Library
 
         public Func<TItem, string>? FormatterString { get; set; }
 
+        public string? Append { get; set; }
+
         public DataGridEditorInfo<TItem>? EditorInfo { get; set; }
 
         public DataGridCellInfo<TItem> Clone()

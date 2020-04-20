@@ -20,5 +20,7 @@ namespace BDataGrid.Library
         public Func<TItem, object?> ValueSelector { get; set; }
 
         public Func<TItem, string> Formatter { get; set; }
+
+        public string? Append { get; set; }
     }
 }

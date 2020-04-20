@@ -20,6 +20,8 @@ namespace BDataGrid.Example.Pages
             public bool IsGroup { get; set; }
 
             public bool IsFilteredOut { get; set; }
+
+            public bool IsTotal { get; set; }
         }
 
         private List<DataItem> Datas { get; set; }
@@ -32,32 +34,38 @@ namespace BDataGrid.Example.Pages
                 .Property(p => p.Description)
                     .HasHeaderText("Description")
                 .Property(p => p.Value)
-                    .HasHeaderText("Value");
+                    .HasHeaderText("Value")
+                    .HasAppendedText("$");
 
             builder
-                .If(item => !item.IsGroup)
+                .If(item => !item.IsTotal)
+                    .If(item => !item.IsGroup)
+                        .Property(p => p.Description)
+                            .HasTextEditor()
+                    .ElseRow()
+                        .HasClass("active bold")
+                        .IsReadOnly()
+                        .Property(p => p.Description)
+                            .HasColSpan(2)
+                    .EndIf()
+                    .If(item => item.Value % 2 == 0)
+                        .Property(p => p.Value)
+                            .If(item => item.Value == 4)
+                                .HasClass("positive")
+                            .Else()
+                                .HasBackgroundColor("#fcd1d1") // error/red color
+                            .EndIf()
+                        .Property(p => p.Description)
+                            .HasClass("warning")
+                    .ElseRow()
+                        .Property(p => p.Description)
+                            .HasClass("positive");
+
+            builder
+                .If(x => x.IsTotal)
+                    .HasFooterLocation()
                     .Property(p => p.Value)
-                        .HasFormatter(item => item.Value + "$")
-                    .Property(p => p.Description)
-                        .HasTextEditor()
-                .ElseRow()
-                    .HasClass("active bold")
-                    .IsReadOnly()
-                    .Property(p => p.Description)
-                        .HasColSpan(2)
-                .EndIf()
-                .If(item => item.Value % 2 == 0)
-                    .Property(p => p.Value)
-                        .If(item => item.Value == 4)
-                            .HasClass("positive")
-                        .Else()
-                            .HasBackgroundColor("#fcd1d1") // error/red color
-                        .EndIf()
-                    .Property(p => p.Description)
-                        .HasClass("warning")
-                .ElseRow()
-                    .Property(p => p.Description)
-                        .HasClass("positive");
+                        .HasFormatter(_ => builder.FilteredItems.Sum(x => x.Item.Value).ToString("0.00"));
         }
 
         protected override async Task OnInitializedAsync()
@@ -139,6 +147,9 @@ namespace BDataGrid.Example.Pages
                     Description = "sadadawd",
                     Value = 9
                 }
+            }).Append(new DataItem()
+            {
+                IsTotal = true
             }).ToList();
         }
     }

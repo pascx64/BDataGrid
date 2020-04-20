@@ -48,7 +48,7 @@ namespace BDataGrid.Library
 
         public int CurrentPage { get; set; } = 0;
 
-        private DataGridBuilder<TItem> Builder { get; set; }
+        internal DataGridBuilder<TItem> Builder { get; private set; }
 
         private ElementReference? TableRef { get; set; }
 
@@ -65,7 +65,7 @@ namespace BDataGrid.Library
         }
 
 
-        private async Task SelectedCellFromClient(TItem? item, DataGridColInfo<TItem>? col)
+        internal async Task SelectedCellFromClient(TItem? item, DataGridColInfo<TItem>? col, bool forceStateChange = false)
         {
             if (item != SelectedCell?.Item || col != SelectedCell?.Col)
             {
@@ -74,6 +74,9 @@ namespace BDataGrid.Library
                 CurrentEditorRenderFragment = null;
 
                 await SelectedCellChanged.InvokeAsync(SelectedCell);
+
+                if (forceStateChange)
+                    StateHasChanged();
             }
         }
 
@@ -105,8 +108,8 @@ namespace BDataGrid.Library
 
         #region Editors
 
-        private DataGridEditorArgs? CurrentEditor { get; set; }
-        private RenderFragment<DataGridEditorArgs>? CurrentEditorRenderFragment { get; set; }
+        internal DataGridEditorArgs? CurrentEditor { get; private set; }
+        internal RenderFragment<DataGridEditorArgs>? CurrentEditorRenderFragment { get; private set; }
 
         public async Task OpenEditor(TItem item, DataGridColInfo<TItem> col, string? firstCharacter = null)
         {
@@ -131,6 +134,8 @@ namespace BDataGrid.Library
                 Value = firstCharacter == null ? Builder.Columns[col.Id].ValueSelector(item) : null,
             };
             CurrentEditorRenderFragment = cellInfo.EditorInfo.RenderFragmentProvider(item);
+
+            StateHasChanged();
         }
 
         [JSInvokable]
@@ -141,7 +146,6 @@ namespace BDataGrid.Library
 
             await OpenEditor(SelectedCell.Item, SelectedCell.Col, key == "" ? null : key);
 
-            StateHasChanged();
         }
 
         #endregion

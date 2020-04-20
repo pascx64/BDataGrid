@@ -9,8 +9,11 @@ namespace BDataGrid.Library
     {
         protected DataGridRowBuilder<TItem> LastFlow { get; }
 
-        public DataGridRowBuilder(DataGridRowBuilder<TItem>? lastFlow)
+        internal DataGridBuilder<TItem> DataGridBuilder { get; }
+
+        public DataGridRowBuilder(DataGridBuilder<TItem>? dataGridBuilder, DataGridRowBuilder<TItem>? lastFlow)
         {
+            DataGridBuilder = dataGridBuilder ?? (DataGridBuilder<TItem>)this;
             LastFlow = lastFlow ?? this;
         }
         #region constructor and generic methods
@@ -97,6 +100,22 @@ namespace BDataGrid.Library
         {
             AddAction(rowInfo => rowInfo.IsReadOnly = value);
             return this;
+        }
+
+        public DataGridRowBuilder<TItem> HasLocation(RowLocation location)
+        {
+            AddAction(rowInfo => rowInfo.RowLocation = location);
+            return this;
+        }
+
+        public DataGridRowBuilder<TItem> HasFooterLocation()
+        {
+            return HasLocation(RowLocation.Footer);
+        }
+
+        public DataGridRowBuilder<TItem> HasHeaderLocation()
+        {
+            return HasLocation(RowLocation.Header);
         }
 
         public DataGridRowBuilder<TItem> HasClass(string classes, bool overrideExisting = false)
