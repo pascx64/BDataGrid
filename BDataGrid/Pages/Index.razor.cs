@@ -65,7 +65,7 @@ namespace BDataGrid.Example.Pages
             await base.OnInitializedAsync();
 
 
-            Datas = Enumerable.Range(0, 50).SelectMany(x => new List<DataItem>()
+            Datas = Enumerable.Range(0, 1000).SelectMany(x => new List<DataItem>()
             {
                 new DataItem()
                 {

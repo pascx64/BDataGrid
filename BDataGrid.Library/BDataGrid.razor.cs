@@ -44,6 +44,7 @@ namespace BDataGrid.Library
         [Parameter]
         public int PageSize { get; set; } = 500;
 
+        public int CurrentTotalPages => (int)Math.Ceiling(Items.Count / (float)PageSize);
 
         public int CurrentPage { get; set; } = 0;
 

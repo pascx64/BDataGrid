@@ -66,13 +66,43 @@
 
     </tbody>
 
-    @if (Items.Count > PageSize)
+    @if (CurrentTotalPages > 1)
     {
         <tfoot>
 
             <tr>
                 <th colspan="@(Builder.Columns.Count.ToString())">
-
+                    <div class="@BDataGridStyle.PaginationDivClass">
+                        @if (CurrentPage > 0)
+                        {
+                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage = 0">
+                                <i class="@BDataGridStyle.PaginationLeftIcon"></i>
+                            </a>
+                        }
+                        @if (CurrentPage > 1)
+                        {
+                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage -= 2">@(CurrentPage - 1)</a>
+                        }
+                        @if (CurrentPage > 0)
+                        {
+                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage -= 1">@(CurrentPage)</a>
+                        }
+                        <a class="@BDataGridStyle.PaginationPageNumberClass active">@(CurrentPage + 1)</a>
+                        @if (CurrentTotalPages - CurrentPage > 1)
+                        {
+                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage += 1">@(CurrentPage + 2)</a>
+                        }
+                        @if (CurrentTotalPages - CurrentPage > 2)
+                        {
+                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage += 2">@(CurrentPage + 3)</a>
+                        }
+                        @if (CurrentPage != CurrentTotalPages - 1)
+                        {
+                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage = CurrentTotalPages - 1">
+                                <i class="@BDataGridStyle.PaginationRightIcon"></i>
+                            </a>
+                        }
+                    </div>
                 </th>
             </tr>
 

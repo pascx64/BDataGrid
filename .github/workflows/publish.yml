@@ -21,7 +21,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build BDataGrid.Library/BDataGrid.Library.csproj --configuration Release --no-restore
 
     - name: Push with dotnet
       run: dotnet nuget push BDataGrid.Library/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
