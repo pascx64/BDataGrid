@@ -9,14 +9,6 @@ namespace BDataGrid {
             element.focus();
     }
 
-    export function onkeypress(ev: KeyboardEvent) {
-
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
-
-        return false;
-    }
-
     export function initializeDatagrid(datagridDotnet: any, element: HTMLBaseElement) {
 
         element.onkeydown = ev => {
@@ -24,10 +16,24 @@ namespace BDataGrid {
                 ev.preventDefault();
                 ev.stopPropagation();
 
-                datagridDotnet.invokeMethodAsync('OnKeyDownPressed', ev.keyCode)
+                datagridDotnet.invokeMethodAsync('OnArrowKeysPressed', ev.keyCode)
                 return false;
             }
-            
+
+            let key = ev.key;
+            let keyCode = ev.keyCode
+            let isEnter = keyCode == 13;
+
+            var regExp = /^[A-Za-z0-9]+$/;
+            let isAlphaNumeric = (!!key.match(regExp) && key.length == 1) ||
+                (['-', '+', '*', '/', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '=', '\\', 'é', 'è', 'à', 'É', 'È', 'À', '.'].indexOf(key) != -1);
+
+            if (isAlphaNumeric || isEnter) {
+
+                datagridDotnet.invokeMethodAsync('OnKeyDown', isEnter ? "" : key);
+
+            }
+
             return true;
         };
 

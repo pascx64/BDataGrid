@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BDataGrid.Example.Pages
 {
-    public partial class Index: ComponentBase
+    public partial class Index : ComponentBase
     {
         public class DataItem
         {
@@ -37,9 +37,12 @@ namespace BDataGrid.Example.Pages
             builder
                 .If(item => !item.IsGroup)
                     .Property(p => p.Value)
-                        .Formatter(item => item.Value + "$")
-                .Else()
+                        .HasFormatter(item => item.Value + "$")
+                    .Property(p => p.Description)
+                        .HasTextEditor()
+                .ElseRow()
                     .HasClass("active bold")
+                    .IsReadOnly()
                     .Property(p => p.Description)
                         .HasColSpan(2)
                 .EndIf()
@@ -52,7 +55,7 @@ namespace BDataGrid.Example.Pages
                         .EndIf()
                     .Property(p => p.Description)
                         .HasClass("warning")
-                .Else()
+                .ElseRow()
                     .Property(p => p.Description)
                         .HasClass("positive");
         }

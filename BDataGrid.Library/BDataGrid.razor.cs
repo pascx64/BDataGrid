@@ -63,6 +63,8 @@ namespace BDataGrid.Library
             if (item != SelectedCell?.Item || col != SelectedCell?.Col)
             {
                 SelectedCell = item == null || col == null ? null : new DataGridSelectedCellInfo<TItem>(item, col);
+                CurrentEditor = null;
+                CurrentEditorRenderFragment = null;
 
                 await SelectedCellChanged.InvokeAsync(SelectedCell);
             }
@@ -78,6 +80,66 @@ namespace BDataGrid.Library
             if (SelectedCell != null && TableRef != null && SelectedCellChangedSinceLastRefresh)
                 _ = TableRef.Value.FocusAsync(JSRuntime, ".selectedCell");
         }
+
+        private DataGridCellInfo<TItem>? GetCellInfo(int itemIndex, string col)
+        {
+            var info = Builder.RowInfos[itemIndex];
+
+            if (info == null)
+                return Builder.GlobalRowInfo.Cells == null ? null : Builder.GlobalRowInfo.Cells.TryGetValue(col, out var cellInfo) ? cellInfo : null;
+
+            return info.Cells == null ? null : info.Cells.TryGetValue(col, out var cellInfo2) ? cellInfo2 : null;
+        }
+
+        private DataGridCellInfo<TItem>? GetCellInfo(TItem item, DataGridColInfo<TItem> col)
+        {
+            return GetCellInfo(Items.IndexOf(item), col.Id);
+        }
+
+        #region Editors
+
+        private DataGridEditorArgs? CurrentEditor { get; set; }
+        private RenderFragment<DataGridEditorArgs>? CurrentEditorRenderFragment { get; set; }
+
+        public async Task OpenEditor(TItem item, DataGridColInfo<TItem> col, string? firstCharacter = null)
+        {
+            if (item != SelectedCell?.Item || col != SelectedCell?.Col)
+            {
+                if (CurrentEditor != null && CurrentEditor.ForceAccept != null)
+                    await CurrentEditor.ForceAccept();
+
+                await SelectedCellFromClient(item, col);
+            }
+
+            if (Builder.RowInfos[Items.IndexOf(item)]?.IsReadOnly ?? Builder.GlobalRowInfo.IsReadOnly ?? false)
+                return;
+
+            var cellInfo = GetCellInfo(item, col);
+            if (cellInfo?.EditorInfo?.RenderFragmentProvider == null)
+                return;
+
+            CurrentEditor = new DataGridEditorArgs()
+            {
+                FirstCharacter = firstCharacter,
+                Value = firstCharacter == null ? Builder.Columns[col.Id].ValueSelector(item) : null,
+            };
+            CurrentEditorRenderFragment = cellInfo.EditorInfo.RenderFragmentProvider(item);
+        }
+
+        [JSInvokable]
+        public async Task OnKeyDown(string key)
+        {
+            if (SelectedCell == null || CurrentEditor != null)
+                return;
+
+            await OpenEditor(SelectedCell.Item, SelectedCell.Col, key == "" ? null : key);
+
+            StateHasChanged();
+        }
+
+        #endregion
+
+        #region Arrow keys
 
         private DataGridColInfo<TItem> FindColUnderCell(int row, string col)
         {
@@ -105,9 +167,8 @@ namespace BDataGrid.Library
 
             throw new Exception("Couldn't find col:" + col);
         }
-
         [JSInvokable]
-        public async Task OnKeyDownPressed(int keyCode)
+        public async Task OnArrowKeysPressed(int keyCode)
         {
             if (SelectedCell == null)
                 return;
@@ -160,6 +221,8 @@ namespace BDataGrid.Library
             if (refresh)
                 StateHasChanged();
         }
+
+        #endregion
 
         public void Dispose()
         {

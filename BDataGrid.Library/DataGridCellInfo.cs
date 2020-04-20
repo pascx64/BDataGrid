@@ -3,7 +3,7 @@
 namespace BDataGrid.Library
 {
     public class DataGridCellInfo<TItem>
-        where TItem: class
+        where TItem : class
     {
         public System.Drawing.Color? BackgroundColor { get; set; }
 
@@ -14,6 +14,8 @@ namespace BDataGrid.Library
         public bool? IsReadOnly { get; set; }
 
         public Func<TItem, string>? FormatterString { get; set; }
+
+        public DataGridEditorInfo<TItem>? EditorInfo { get; set; }
 
         public DataGridCellInfo<TItem> Clone()
         {

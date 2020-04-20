@@ -1,0 +1,39 @@
+﻿@inherits BDataGridEditorBase
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+<input @ref="Ref" @bind-value="Text" @bind-value:event="oninput" @onkeydown="OnKeyDown" @onclick:preventDefault="true" @onclick:stopPropagation="true"
+       style="width: 100%; border: transparent !important; background: transparent; height: 100%; outline: transparent;" />
+
+@code {
+    public string Text { get; set; } = "";
+
+    private ElementReference Ref { get; set; }
+
+    private async Task OnKeyDown(KeyboardEventArgs ev)
+    {
+        if (ev.Key == "Enter")
+            await AcceptChanges.InvokeAsync(Text);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            if (Args.Value != null && !(Args.Value is string str))
+                throw new Exception("Text editor can only be used with string");
+
+            if (Args.FirstCharacter != null)
+                Text = Args.FirstCharacter;
+            else
+                Text = (string?)Args.Value ?? "";
+
+            Args.ForceAccept = () => AcceptChanges.InvokeAsync(Text);
+
+            StateHasChanged();
+
+            _ = Ref.FocusAsync(JSRuntime);
+        }
+    }
+}

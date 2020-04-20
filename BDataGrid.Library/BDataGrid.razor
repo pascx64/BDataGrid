@@ -34,6 +34,7 @@
                             --colspanToSkip;
                             continue;
                         }
+                        var isCurrentCell = SelectedCell?.Item == item && SelectedCell.Col == col.Value;
 
                         DataGridCellInfo<TItem>? cellInfo = null;
                         if (rowInfo.Cells != null)
@@ -43,10 +44,18 @@
 
                         <td tabindex="0" colspan="@colspanToSkip.ToString()"
                             style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value))"
-                            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(SelectedCell?.Item == item && SelectedCell.Col == col.Value ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
-                            @onclick="() => SelectedCellFromClient(item, col.Value)">
+                            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isCurrentCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
+                            @onclick="() => SelectedCellFromClient(item, col.Value)"
+                            @ondblclick="() => OpenEditor(item, col.Value)">
 
-                            @((cellInfo?.FormatterString ?? col.Value.Formatter)(item))
+                            @if (isCurrentCell && CurrentEditor != null && CurrentEditorRenderFragment != null)
+                            {
+                                @CurrentEditorRenderFragment(CurrentEditor);
+                            }
+                            else
+                            {
+                                @((cellInfo?.FormatterString ?? col.Value.Formatter)(item))
+                            }
 
                         </td>
                     }
