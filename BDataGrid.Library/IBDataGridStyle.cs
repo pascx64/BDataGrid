@@ -17,5 +17,13 @@ namespace BDataGrid.Library
         string HeaderRowClass { get; set; }
 
         string SelectedCell { get; set; }
+
+        string PaginationDivClass { get; set; }
+
+        string PaginationPageNumberClass { get; set; }
+
+        string PaginationLeftIcon { get; set; }
+
+        string PaginationRightIcon { get; set; }
     }
 }
