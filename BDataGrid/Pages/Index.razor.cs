@@ -65,7 +65,7 @@ namespace BDataGrid.Example.Pages
             await base.OnInitializedAsync();
 
 
-            Datas = new List<DataItem>()
+            Datas = Enumerable.Range(0, 50).SelectMany(x => new List<DataItem>()
             {
                 new DataItem()
                 {
@@ -139,7 +139,7 @@ namespace BDataGrid.Example.Pages
                     Description = "sadadawd",
                     Value = 9
                 }
-            };
+            }).ToList();
         }
     }
 }

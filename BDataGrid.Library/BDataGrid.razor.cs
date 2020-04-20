@@ -41,6 +41,12 @@ namespace BDataGrid.Library
             }
         }
 
+        [Parameter]
+        public int PageSize { get; set; } = 500;
+
+
+        public int CurrentPage { get; set; } = 0;
+
         private DataGridBuilder<TItem> Builder { get; set; }
 
         private ElementReference? TableRef { get; set; }
