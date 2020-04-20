@@ -18,7 +18,7 @@ jobs:
         dotnet-version: 3.1.101
 
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore BDataGrid.Library/BDataGrid.Library.csproj
 
     - name: Build
       run: dotnet build BDataGrid.Library/BDataGrid.Library.csproj --configuration Release --no-restore
