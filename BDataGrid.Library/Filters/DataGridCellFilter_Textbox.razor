@@ -1,0 +1,14 @@
+﻿@inherits DataGridCellFilterBase
+
+<input type="text" style="width: 100%;" value="@Filter" @oninput="ev => ValueChangedFromClient(ev.Value)" />
+
+@code {
+
+    private Task ValueChangedFromClient(object value)
+    {
+        Filter = value;
+
+        return FilterChanged.InvokeAsync(value);
+    }
+
+}

@@ -1,0 +1,9 @@
+﻿
+@code {
+
+    [Parameter]
+    public EventCallback<object?> FilterChanged { get; set; }
+
+    [Parameter]
+    public virtual object? Filter { get; set; }
+}

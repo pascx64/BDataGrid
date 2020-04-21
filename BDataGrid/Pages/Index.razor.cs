@@ -37,6 +37,8 @@ namespace BDataGrid.Example.Pages
                     .HasHeaderText("Value")
                     .HasAppendedText("$");
 
+            builder.HasFilterRow();
+
             builder
                 .If(item => !item.IsTotal)
                     .If(item => !item.IsGroup)
@@ -73,7 +75,7 @@ namespace BDataGrid.Example.Pages
             await base.OnInitializedAsync();
 
 
-            Datas = Enumerable.Range(0, 1000).SelectMany(x => new List<DataItem>()
+            Datas = Enumerable.Range(0, 9999999).SelectMany(x => new List<DataItem>()
             {
                 new DataItem()
                 {
@@ -147,7 +149,7 @@ namespace BDataGrid.Example.Pages
                     Description = "sadadawd",
                     Value = 9
                 }
-            }).Append(new DataItem()
+            }).Take(80000).Append(new DataItem()
             {
                 IsTotal = true
             }).ToList();

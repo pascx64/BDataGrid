@@ -14,6 +14,17 @@
             }
         </tr>
 
+        @if (Builder.ShowHeaderFilters)
+        {
+            <tr @onclick="() => SelectedCellFromClient(null, null, false)" @onclick:stopPropagation="true">
+                @foreach (var col in Builder.Columns)
+                {
+                    <th>
+                        @col.Value.FilterRenderFragment(col.Value)(this)
+                    </th>
+                }
+            </tr>
+        }
 
         @for (int i = 0; i < Builder.HeaderItems.Count; ++i)
         {

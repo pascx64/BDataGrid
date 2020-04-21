@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using System;
 
 namespace BDataGrid.Library
 {
@@ -16,6 +17,8 @@ namespace BDataGrid.Library
         public Func<TItem, string>? FormatterString { get; set; }
 
         public string? Append { get; set; }
+
+        public Func<TItem, RenderFragment<TItem>>? Formatter { get; set; }
 
         public DataGridEditorInfo<TItem>? EditorInfo { get; set; }
 

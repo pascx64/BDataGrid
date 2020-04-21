@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace BDataGrid.Library
 {
@@ -12,11 +13,39 @@ namespace BDataGrid.Library
         protected string PropertyName { get; private set; }
         private DataGridRowBuilder<TItem> DataGridRowBuilder { get; set; }
 
+        protected readonly Func<TItem, TProperty> SelectorFunc;
+
+        protected readonly Action<TItem, object?> SetFunc;
+
+
         public DataGridCellBuilder(Expression<Func<TItem, TProperty>> selector, DataGridRowBuilder<TItem> dataGridRowBuilder)
         {
             Selector = selector;
-            PropertyName = selector.ToString();
             DataGridRowBuilder = dataGridRowBuilder;
+
+            SelectorFunc = Selector.Compile();
+
+            if (Selector.Body.NodeType == ExpressionType.MemberAccess)
+            {
+                var memberExpression = (MemberExpression)Selector.Body;
+
+                if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
+                {
+                    var member = memberExpression.Member;
+                    if (member is PropertyInfo memberProperty)
+                        SetFunc = memberProperty.SetValue;
+                    else if (member is FieldInfo memberField)
+                        SetFunc = memberField.SetValue;
+                    else
+                        throw new Exception("Unable to determine member access :" + selector.ToString());
+
+                    PropertyName = member.Name;
+                }
+                else
+                    throw new Exception("Unable to determine member access :" + selector.ToString());
+            }
+            else
+                throw new Exception("Unable to determine member access :" + selector.ToString());
         }
         private readonly Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>> Actions = new Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>>();
 
@@ -181,6 +210,37 @@ namespace BDataGrid.Library
         public DataGridCellBuilder<TItem, TProperty> HasAppendedText(string append)
         {
             return AddAction((row, cell) => cell.Append = append);
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasFormatter(Func<TItem, RenderFragment<TItem>> renderFragmentProvider)
+        {
+            return AddAction((row, cell) =>
+            {
+                cell.Formatter = renderFragmentProvider;
+            });
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
+        {
+            return HasFormatter(item =>
+            {
+                return item =>
+                {
+                    return builder =>
+                    {
+                        builder.OpenComponent(0, editorType);
+                        builder.AddAttribute(1, "Args", item);
+                        if (argsProvider != null)
+                        {
+                            var editorArgs = argsProvider(item);
+                            int sequence = 1;
+                            foreach (var property in editorArgs.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                                builder.AddAttribute(++sequence, property.Name, property.GetValue(editorArgs));
+                        }
+                        builder.CloseComponent();
+                    };
+                };
+            });
         }
     }
 }

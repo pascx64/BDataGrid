@@ -44,9 +44,16 @@ namespace BDataGrid.Library
         [Parameter]
         public int PageSize { get; set; } = 500;
 
-        public int CurrentTotalPages => (int)Math.Ceiling(Items.Count / (float)PageSize);
+        public int CurrentTotalPages => (int)Math.Ceiling(Builder.FilteredItems.Count / (float)PageSize);
 
-        public int CurrentPage { get; set; } = 0;
+        private int CurrentPage_ = 0;
+        public int CurrentPage
+        {
+            // Make sure we're not showing a page out of range of the current FilteredItems
+            // also, Max(0,..) will prevent from showing the page '-1' if there aren't any pages to show
+            get => Math.Max(0, Math.Min(CurrentTotalPages - 1, CurrentPage_));
+            set => CurrentPage_ = value;
+        }
 
         internal DataGridBuilder<TItem> Builder { get; private set; }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,8 +10,9 @@ namespace BDataGrid.Library
     public class DataGridColBuilder<TItem, TProperty> : DataGridCellBuilder<TItem, TProperty>
         where TItem : class
     {
-
         private readonly DataGridBuilder<TItem> GridBuilder;
+
+
         public DataGridColBuilder(Expression<Func<TItem, TProperty>> selector, DataGridRowBuilder<TItem> dataGridRowBuilder) : base(selector, dataGridRowBuilder)
         {
             if (dataGridRowBuilder is DataGridBuilder<TItem> gridBuilder)
@@ -37,12 +39,14 @@ namespace BDataGrid.Library
             DataGridColInfo<TItem> colInfo;
             if (!GridBuilder.Columns.TryGetValue(PropertyName, out var colInfo_) || colInfo_ == null)
             {
-                var selector = Selector.Compile();
                 colInfo = GridBuilder.Columns[PropertyName] = new DataGridColInfo<TItem>()
                 {
                     Id = PropertyName,
-                    ValueSelector = x => selector(x),
-                    Formatter = x => selector(x)?.ToString() ?? ""
+                    ValueSelector = x => SelectorFunc(x),
+                    HeaderText = PropertyName,
+                    Formatter = x => SelectorFunc(x)?.ToString() ?? "",
+                    ValueSet = SetFunc,
+                    FilterRenderFragment = GetFilterFormatter(typeof(Filters.DataGridCellFilter_Textbox), null)
                 };
             }
             else
@@ -64,9 +68,50 @@ namespace BDataGrid.Library
             return AddAction(c => c.HeaderText = text);
         }
 
-        public new DataGridColBuilder<TItem, TProperty> HasAppendedText(string text)
+        public DataGridColBuilder<TItem, TProperty> HasFilterMethod(Func<DataGridColInfo<TItem>, DataGridRowInfo<TItem>, TItem, FilterResult> method)
         {
-            return AddAction(c => c.Append = text);
+            return AddAction(col => col.FilterMethod = method);
+        }
+        public DataGridColBuilder<TItem, TProperty> HasFilterFormatter(Func<DataGridColInfo<TItem>, RenderFragment<BDataGrid<TItem>>> renderFragmentProvider)
+        {
+            return AddAction((col) => col.FilterRenderFragment = renderFragmentProvider);
+        }
+        private Func<DataGridColInfo<TItem>, RenderFragment<BDataGrid<TItem>>> GetFilterFormatter(Type editorType, object? args)
+        {
+            return col =>
+            {
+                return bdatagrid =>
+                {
+                    return builder =>
+                    {
+                        builder.OpenComponent(0, editorType);
+                        builder.AddAttribute(1, "Filter", col.CurrentFilterValue);
+                        builder.AddAttribute(2, "FilterChanged", new EventCallback<object?>(bdatagrid, (Action<object?>)(value =>
+                        {
+                            col.CurrentFilterValue = value;
+
+                            GridBuilder.Filter();
+                        })));
+                        if (args != null)
+                        {
+                            int sequence = 2;
+                            foreach (var property in args.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                                builder.AddAttribute(++sequence, property.Name, property.GetValue(args));
+                        }
+                        builder.CloseComponent();
+                    };
+                };
+            };
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasFilterFormatter(Type editorType, object? editorArgs = null)
+        {
+            return HasFilterFormatter(GetFilterFormatter(editorType, editorArgs));
+        }
+        public DataGridCellBuilder<TItem, TProperty> HasFilterFormatter<TFilter>(object? editorArgs = null)
+            where TFilter : Filters.DataGridCellFilterBase
+        {
+            return HasFilterFormatter(typeof(TFilter), editorArgs);
         }
     }
 }
