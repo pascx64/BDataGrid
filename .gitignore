@@ -8,3 +8,5 @@
 /BDataGrid.Library/bin/Debug/netstandard2.0
 /BDataGrid.Library/obj
 /BDataGrid.Library/bin/Debug
+/BDataGrid/bin/Release/netcoreapp3.1
+/BDataGrid.Library/bin/Release

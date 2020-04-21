@@ -8,22 +8,27 @@
         <tr class="@(BDataGridStyle.HeaderRowClass)">
             @foreach (var col in Builder.Columns)
             {
-                <th style="@(col.Value.Width == null ? "" : "width: " + col.Value.Width)">
-                    @(col.Value.HeaderText ?? "Unknowned header")
-                </th>
+            <th @onclick="() => SortingDirectionChangedFromClient(col.Value)" class="@(col.Value.CurrentSortDirection switch
+                             {
+                                 SortDirection.Ascending => BDataGridStyle.HeaderSortedAscendingClass,
+                                 SortDirection.Descending => BDataGridStyle.HeaderSortedDescendingClass,
+                                 _ => ""
+                             })" style="@(col.Value.Width == null ? "" : "width: " + col.Value.Width)">
+                @(col.Value.HeaderText ?? "Unknowned header")
+            </th>
             }
         </tr>
 
         @if (Builder.ShowHeaderFilters)
         {
-            <tr @onclick="() => SelectedCellFromClient(null, null, false)" @onclick:stopPropagation="true">
-                @foreach (var col in Builder.Columns)
+        <tr @onclick="() => SelectedCellFromClient(null, null, false)" @onclick:stopPropagation="true">
+            @foreach (var col in Builder.Columns)
                 {
-                    <th>
-                        @col.Value.FilterRenderFragment(col.Value)(this)
-                    </th>
+            <th>
+                @col.Value.FilterRenderFragment(col.Value)(this)
+            </th>
                 }
-            </tr>
+        </tr>
         }
 
         @for (int i = 0; i < Builder.HeaderItems.Count; ++i)
@@ -33,7 +38,7 @@
             var rowInfo = Builder.RowInfos[itemAndIndex.Index] ?? Builder.GlobalRowInfo;
 
 
-            <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
+        <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
         }
 
     </thead>
@@ -47,7 +52,7 @@
             var rowInfo = Builder.RowInfos[itemAndIndex.Index] ?? Builder.GlobalRowInfo;
 
 
-            <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
+        <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
         }
 
     </tbody>
@@ -61,49 +66,48 @@
             var rowInfo = Builder.RowInfos[itemAndIndex.Index] ?? Builder.GlobalRowInfo;
 
 
-            <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
+        <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
         }
 
         @if (CurrentTotalPages > 1)
         {
-            <tr>
-                <th colspan="@(Builder.Columns.Count.ToString())">
-                    <div class="@BDataGridStyle.PaginationDivClass">
-                        @if (CurrentPage > 0)
+        <tr>
+            <th colspan="@(Builder.Columns.Count.ToString())">
+                <div class="@BDataGridStyle.PaginationDivClass">
+                    @if (CurrentPage > 0)
                         {
-                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage = 0">
-                                <i class="@BDataGridStyle.PaginationLeftIcon"></i>
-                            </a>
+                    <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage = 0">
+                        <i class="@BDataGridStyle.PaginationLeftIcon"></i>
+                    </a>
                         }
-                        @if (CurrentPage > 1)
+                    @if (CurrentPage > 1)
                         {
-                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage -= 2">@(CurrentPage - 1)</a>
+                    <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage -= 2">@(CurrentPage - 1)</a>
                         }
-                        @if (CurrentPage > 0)
+                    @if (CurrentPage > 0)
                         {
-                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage -= 1">@(CurrentPage)</a>
+                    <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage -= 1">@(CurrentPage)</a>
                         }
-                        <a class="@BDataGridStyle.PaginationPageNumberClass active">@(CurrentPage + 1)</a>
-                        @if (CurrentTotalPages - CurrentPage > 1)
+                    <a class="@BDataGridStyle.PaginationPageNumberClass active">@(CurrentPage + 1)</a>
+                    @if (CurrentTotalPages - CurrentPage > 1)
                         {
-                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage += 1">@(CurrentPage + 2)</a>
+                    <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage += 1">@(CurrentPage + 2)</a>
                         }
-                        @if (CurrentTotalPages - CurrentPage > 2)
+                    @if (CurrentTotalPages - CurrentPage > 2)
                         {
-                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage += 2">@(CurrentPage + 3)</a>
+                    <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage += 2">@(CurrentPage + 3)</a>
                         }
-                        @if (CurrentPage != CurrentTotalPages - 1)
+                    @if (CurrentPage != CurrentTotalPages - 1)
                         {
-                            <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage = CurrentTotalPages - 1">
-                                <i class="@BDataGridStyle.PaginationRightIcon"></i>
-                            </a>
+                    <a class="@BDataGridStyle.PaginationPageNumberClass" @onclick="() => CurrentPage = CurrentTotalPages - 1">
+                        <i class="@BDataGridStyle.PaginationRightIcon"></i>
+                    </a>
                         }
-                    </div>
-                </th>
-            </tr>
+                </div>
+            </th>
+        </tr>
 
         }
 
     </tfoot>
 </table>
-

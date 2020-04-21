@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BDataGrid.Library
 {
@@ -18,6 +19,8 @@ namespace BDataGrid.Library
         }
 
         internal bool ShowHeaderFilters { get; set; }
+
+        internal bool AllowHeaderSorting { get; set; } = true;
 
         public IReadOnlyList<TItem> Items { get; private set; }
         public IReadOnlyList<(int Index, TItem Item)> AllBodyItems { get; private set; }
@@ -69,8 +72,7 @@ namespace BDataGrid.Library
                 {
                     RowInfos.Add(null);
 
-                    if (!IsFilteredOut(cacheRowInfo, item))
-                        allBodyItems.Add((i, item));
+                    allBodyItems.Add((i, item));
                 }
             }
 
@@ -78,21 +80,39 @@ namespace BDataGrid.Library
             HeaderItems = headerItems;
             FooterItems = footerItems;
 
-            Filter();
+            FilterAndSort();
         }
 
-        public void Filter()
+
+        public void FilterAndSort()
         {
-            var filteredItems = new List<(int Index, TItem item)>(Items.Count);
+            List<(string? str, (int Index, TItem item))> sortedItems = new List<(string? str, (int Index, TItem item))>(AllBodyItems.Count);
+            DataGridColInfo<TItem>? sortingCol = null;
+
+            if (AllowHeaderSorting)
+                sortingCol = Columns.Values.FirstOrDefault(x => x.CurrentSortDirection != null);
 
             foreach (var row in AllBodyItems)
             {
                 var rowInfo = RowInfos[row.Index] ?? GlobalRowInfo;
                 if (!IsFilteredOut(rowInfo, row.Item))
-                    filteredItems.Add(row);
+                {
+                    if (sortingCol?.CurrentSortDirection != null)
+                    {
+                        var formatterString = rowInfo.Cells == null ? null : rowInfo.Cells.TryGetValue(sortingCol.Id, out var cellInfo) ? cellInfo.FormatterString : null;
+
+                        var str = (formatterString ?? sortingCol.Formatter)(row.Item);
+                        sortedItems.Add((str, row));
+                    }
+                    else
+                        sortedItems.Add((str: null, row));
+                }
             }
 
-            FilteredItems = filteredItems;
+            if (sortingCol?.CurrentSortDirection != null)
+                FilteredItems = (sortingCol.CurrentSortDirection == SortDirection.Ascending ? sortedItems.OrderBy(x => x.str) : sortedItems.OrderByDescending(x => x.str)).Select(x => x.Item2).ToList();
+            else
+                FilteredItems = sortedItems.Select(x => x.Item2).ToList();
         }
 
         private bool IsFilteredOut(DataGridRowInfo<TItem> rowInfo, TItem item)
@@ -102,6 +122,9 @@ namespace BDataGrid.Library
 
             foreach (var col in Columns)
             {
+                if (col.Value.CurrentFilterValue == null || col.Value.CurrentFilterValue as string == "")
+                    continue;
+
                 var method = col.Value.FilterMethod ?? DefaultFilterMethod;
 
                 if (method(col.Value, rowInfo, item) == FilterResult.Remove)
@@ -151,6 +174,13 @@ namespace BDataGrid.Library
         public DataGridBuilder<TItem> HasNoFilterRow()
         {
             AddAction(row => ShowHeaderFilters = false);
+
+            return this;
+        }
+
+        public DataGridBuilder<TItem> HasNoSorting()
+        {
+            AddAction(row => AllowHeaderSorting = false);
 
             return this;
         }

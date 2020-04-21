@@ -31,4 +31,26 @@ namespace BDataGrid.Library
             return -1;
         }
     }
+
+
+    internal class DescendingComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            var c = y.CompareTo(x);
+            if (c == 0)
+                return -1;
+            return c;
+        }
+    }
+    internal class AscendingComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            var c = x.CompareTo(y);
+            if (c == 0)
+                return 1;
+            return c;
+        }
+    }
 }

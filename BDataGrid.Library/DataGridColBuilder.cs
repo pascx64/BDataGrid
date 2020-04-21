@@ -90,7 +90,7 @@ namespace BDataGrid.Library
                         {
                             col.CurrentFilterValue = value;
 
-                            GridBuilder.Filter();
+                            GridBuilder.FilterAndSort();
                         })));
                         if (args != null)
                         {

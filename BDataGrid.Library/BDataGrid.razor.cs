@@ -71,6 +71,20 @@ namespace BDataGrid.Library
             }
         }
 
+        public void SortingDirectionChangedFromClient(DataGridColInfo<TItem> col)
+        {
+            var currentSortingCol = Builder.Columns.Values.FirstOrDefault(x => x.CurrentSortDirection != null);
+            if (currentSortingCol != col)
+            {
+                if( currentSortingCol != null )
+                    currentSortingCol.CurrentSortDirection = null;
+                col.CurrentSortDirection = SortDirection.Ascending;
+            }
+            else
+                col.CurrentSortDirection = col.CurrentSortDirection == SortDirection.Ascending ? SortDirection.Descending : (SortDirection?)null;
+
+            Builder.FilterAndSort();
+        }
 
         internal async Task SelectedCellFromClient(TItem? item, DataGridColInfo<TItem>? col, bool forceStateChange = false)
         {

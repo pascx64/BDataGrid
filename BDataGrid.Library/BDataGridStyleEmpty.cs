@@ -25,5 +25,9 @@ namespace BDataGrid.Library
         public string PaginationLeftIcon { get; set; } = "";
 
         public string PaginationRightIcon { get; set; } = "";
+
+        public string HeaderSortedAscendingClass { get; set; } = "";
+
+        public string HeaderSortedDescendingClass { get; set; } = "";
     }
 }

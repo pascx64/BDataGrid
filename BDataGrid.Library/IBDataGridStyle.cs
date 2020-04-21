@@ -16,6 +16,10 @@ namespace BDataGrid.Library
 
         string HeaderRowClass { get; set; }
 
+        string HeaderSortedAscendingClass { get; set; }
+
+        string HeaderSortedDescendingClass { get; set; }
+
         string SelectedCell { get; set; }
 
         string PaginationDivClass { get; set; }
@@ -25,5 +29,6 @@ namespace BDataGrid.Library
         string PaginationLeftIcon { get; set; }
 
         string PaginationRightIcon { get; set; }
+
     }
 }

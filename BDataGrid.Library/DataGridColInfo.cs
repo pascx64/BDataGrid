@@ -11,6 +11,10 @@ namespace BDataGrid.Library
     {
         Keep, Remove
     }
+    public enum SortDirection
+    {
+        Ascending, Descending
+    }
     public class DataGridColInfo<TItem>
         where TItem : class
     {
@@ -27,8 +31,9 @@ namespace BDataGrid.Library
 
         public Func<TItem, string> Formatter { get; set; }
 
-
         public object? CurrentFilterValue { get; set; }
+
+        public SortDirection? CurrentSortDirection { get; set; }
 
         public Func<DataGridColInfo<TItem>, RenderFragment<BDataGrid<TItem>>> FilterRenderFragment { get; set; }
 
