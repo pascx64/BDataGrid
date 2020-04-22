@@ -6,7 +6,7 @@
     <LangVersion>8</LangVersion>
     <Nullable>Enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.17-beta</Version>
+    <Version>1.1.20-beta</Version>
   </PropertyGroup>
 
   <ItemGroup>

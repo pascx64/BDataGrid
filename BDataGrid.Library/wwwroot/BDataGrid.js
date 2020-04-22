@@ -31,10 +31,12 @@ var BDataGrid;
             }
             return true;
         };
-        $(scrollBar).css('width', $(headerTable).width());
-        headerTable.onresize = function () {
-            $(scrollBar).css('width', $(headerTable).width());
-        };
+        var interval = setInterval(function () {
+            if ($(element)[0])
+                $(scrollBar).css('width', $(headerTable).width());
+            else
+                clearInterval(interval);
+        }, 500);
         footerTable.parentElement.onscroll = function (sc) {
             headerTable.parentElement.scrollLeft = this.scrollLeft;
             bodyTable.parentElement.scrollLeft = this.scrollLeft;
