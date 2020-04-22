@@ -31,10 +31,13 @@ namespace BDataGrid.Example.Pages
             builder
                 .Property(p => p.Name)
                     .HasHeaderText("Name")
+                    .HasWidth("250px")
                 .Property(p => p.Description)
                     .HasHeaderText("Description")
+                    .HasWidth("500px")
                 .Property(p => p.Value)
                     .HasHeaderText("Value")
+                    .HasWidth("100px")
                     .HasAppendedText("$");
 
             builder.HasFilterRow();

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace BDataGrid.Library
 {
@@ -30,7 +32,7 @@ namespace BDataGrid.Library
 
         public void Build(IReadOnlyList<TItem> items)
         {
-            Items = items;
+            Items = items ?? new List<TItem>();
 
             Rebuild();
         }
@@ -182,6 +184,44 @@ namespace BDataGrid.Library
         {
             AddAction(row => AllowHeaderSorting = false);
 
+            return this;
+        }
+
+        public DataGridBuilder<TItem> HasClassColumnAttributes()
+        {
+            var properties = typeof(TItem).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var fields = typeof(TItem).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            foreach (var member in properties.OfType<MemberInfo>().Concat(fields))
+            {
+                var attribute = (DataGridColumnInfoAttribute?)member.GetCustomAttribute<DataGridColumnInfoAttribute>(true);
+
+                if (attribute != null)
+                {
+                    var parameter = Expression.Parameter(typeof(TItem), "p");
+                    var body = Expression.MakeMemberAccess(parameter, member);
+
+                    var lambda = Expression.Lambda(body, parameter);
+
+                    var memberType = (member as FieldInfo)?.FieldType ?? ((PropertyInfo)member).PropertyType;
+                    var method = GetType().GetMethods().First(x => x.Name == nameof(Property));
+                    var propertyMethod = method.MakeGenericMethod(memberType);
+
+                    var colProperty = propertyMethod.Invoke(this, new object[] { lambda });
+
+
+                    if (attribute.Width != null)
+                    {
+                        var hasWidth = colProperty.GetType().GetMethod(nameof(DataGridColBuilder<object, int>.HasWidth));
+                        hasWidth.Invoke(colProperty, new object[] { attribute.Width });
+                    }
+                    if (attribute.Name != null)
+                    {
+                        var hasWidth = colProperty.GetType().GetMethod(nameof(DataGridColBuilder<object, int>.HasHeaderText));
+                        hasWidth.Invoke(colProperty, new object[] { attribute.Name });
+                    }
+                }
+            }
             return this;
         }
     }

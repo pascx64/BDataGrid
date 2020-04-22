@@ -14,8 +14,20 @@ namespace BDataGrid.Library
         [Parameter]
         public string TableCssClass { get; set; } = "";
 
+        private IReadOnlyList<TItem> Items_;
         [Parameter]
-        public IReadOnlyList<TItem> Items { get; set; }
+        public IReadOnlyList<TItem> Items
+        {
+            get => Items_;
+            set
+            {
+                if (Items_ != value)
+                {
+                    Items_ = value;
+                    ItemsChanged = true;
+                }
+            }
+        }
 
         [Parameter]
         public Action<DataGridBuilder<TItem>> Configure { get; set; }
@@ -42,7 +54,13 @@ namespace BDataGrid.Library
         }
 
         [Parameter]
-        public int PageSize { get; set; } = 500;
+        public int PageSize { get; set; } = 200;
+
+        [Parameter]
+        public string Width { get; set; } = "100%";
+
+        [Parameter]
+        public string Height { get; set; } = "100%";
 
         public int CurrentTotalPages => (int)Math.Ceiling(Builder.FilteredItems.Count / (float)PageSize);
 
@@ -59,6 +77,7 @@ namespace BDataGrid.Library
 
         private ElementReference? TableRef { get; set; }
 
+        private bool ItemsChanged { get; set; }
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -69,6 +88,11 @@ namespace BDataGrid.Library
                 Configure(Builder);
                 Builder.Build(Items);
             }
+            else if (ItemsChanged)
+            {
+                ItemsChanged = false;
+                Builder.Build(Items);
+            }
         }
 
         public void SortingDirectionChangedFromClient(DataGridColInfo<TItem> col)
@@ -76,7 +100,7 @@ namespace BDataGrid.Library
             var currentSortingCol = Builder.Columns.Values.FirstOrDefault(x => x.CurrentSortDirection != null);
             if (currentSortingCol != col)
             {
-                if( currentSortingCol != null )
+                if (currentSortingCol != null)
                     currentSortingCol.CurrentSortDirection = null;
                 col.CurrentSortDirection = SortDirection.Ascending;
             }

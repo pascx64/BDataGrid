@@ -9,7 +9,10 @@ var BDataGrid;
     }
     BDataGrid.focus = focus;
     function initializeDatagrid(datagridDotnet, element) {
-        element.onkeydown = function (ev) {
+        var headerTable = $(element).find('table')[0];
+        var bodyTable = $(element).find('table')[1];
+        var footerTable = $(element).find('table')[2];
+        bodyTable.onkeydown = function (ev) {
             if (ev.keyCode >= 37 && ev.keyCode <= 40) { // arrows keys
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -26,6 +29,10 @@ var BDataGrid;
                 datagridDotnet.invokeMethodAsync('OnKeyDown', isEnter ? "" : key);
             }
             return true;
+        };
+        footerTable.parentElement.onscroll = function (sc) {
+            headerTable.parentElement.scrollLeft = this.scrollLeft;
+            bodyTable.parentElement.scrollLeft = this.scrollLeft;
         };
         return true;
     }

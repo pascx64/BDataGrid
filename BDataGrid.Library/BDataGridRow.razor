@@ -6,8 +6,10 @@
 
     @{
         int colspanToSkip = 1;
+        int colIndex = -1;
         foreach (var col in DataGrid.Builder.Columns)
         {
+            ++colIndex;
             if (colspanToSkip > 1)
             {
                 --colspanToSkip;
@@ -21,9 +23,11 @@
             colspanToSkip = cellInfo?.ColSpan ?? 1;
 
             var isSelectedCell = DataGrid.SelectedCell?.Col == col.Value && DataGrid.SelectedCell?.Item == Item;
+            var width = @GetWidth(colIndex, colspanToSkip, col.Value);
 
             <td tabindex="0" colspan="@colspanToSkip.ToString()"
-                style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value))"
+                style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value));
+                width: calc(@width); min-width: calc(@width)"
                 class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
                 @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
                 @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
@@ -53,5 +57,12 @@
 
     [Parameter]
     public TItem Item { get; set; }
+
+    private string GetWidth(int colIndex, int colSpan, DataGridColInfo<TItem> col)
+    {
+        var allWidths = DataGrid.Builder.Columns.Skip(colIndex).Take(colSpan).Select(col => col.Value.Width ?? ((100f / DataGrid.Builder.Columns.Count) + "%"));
+
+        return string.Join(" + ", allWidths);
+    }
 
 }
