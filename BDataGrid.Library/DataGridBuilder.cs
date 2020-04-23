@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OfficeOpenXml;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -223,6 +224,86 @@ namespace BDataGrid.Library
                 }
             }
             return this;
+        }
+
+        public void ExportExcel(string filePath)
+        {
+            using var file = System.IO.File.OpenWrite(filePath);
+
+            ExportExcel(file);
+        }
+
+        public void ExportExcel(System.IO.Stream outputStream)
+        {
+            //Creates a blank workbook. Use the using statment, so the package is disposed when we are done.
+            using var p = new ExcelPackage();
+
+            var ws = p.Workbook.Worksheets.Add("Sheet");
+
+            ws.Cells[1, 2, 1, Columns.Count + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            ws.Cells[1, 2, 1, Columns.Count + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#5A5A5A"));
+
+            int colIndex = 1;
+            foreach (var col in Columns)
+            {
+                var header = col.Value.HeaderText;
+                if (string.IsNullOrEmpty(header))
+                    header = "Unknowned header";
+                ws.Cells[1, ++colIndex].Value = header;
+            }
+
+
+            var oddColor = System.Drawing.ColorTranslator.FromHtml("#c0c0c0");
+
+            int rowIndex = 1;
+            foreach (var row in FilteredItems)
+            {
+                var rowInfo = RowInfos[row.Index];
+                int colSpanLeft = 1;
+                colIndex = 1;
+                var rowStart = ++rowIndex;
+
+                if (rowStart % 2 == 0)
+                {
+                    ws.Cells[rowStart, colIndex + 1, rowStart, Columns.Count + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    ws.Cells[rowStart, colIndex + 1, rowStart, Columns.Count + 1].Style.Fill.BackgroundColor.SetColor(oddColor);
+                }
+
+                foreach (var col in Columns)
+                {
+                    --colSpanLeft;
+                    var colStart = ++colIndex;
+                    if (colSpanLeft != 0)
+                        continue;
+
+                    DataGridCellInfo<TItem>? cellInfo = null;
+                    rowInfo?.Cells?.TryGetValue(col.Key, out cellInfo);
+
+                    colSpanLeft = cellInfo?.ColSpan ?? 1;
+                    var excelCell = ws.Cells[rowStart, colStart, rowStart, colStart + colSpanLeft - 1];
+
+                    excelCell.Value = (cellInfo?.FormatterString ?? col.Value.Formatter)(row.Item);
+                    excelCell.Merge = true;
+
+                    if (cellInfo?.BackgroundColor != null)
+                    {
+                        excelCell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                        excelCell.Style.Fill.BackgroundColor.SetColor(cellInfo.BackgroundColor.Value);
+                    }
+                }
+            }
+
+            ws.Cells[1, 2, rowIndex, Columns.Count + 1].AutoFilter = true;
+            colIndex = 1;
+            foreach (var col in Columns)
+            {
+                if (col.Value.AutoWidthExcel)
+                {
+                    ws.Column(++colIndex).AutoFit();
+                }
+            }
+
+            p.SaveAs(outputStream);
         }
     }
 }

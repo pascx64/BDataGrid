@@ -26,7 +26,7 @@ namespace BDataGrid.Library
         {
             var clone = (DataGridRowInfo<TItem>)MemberwiseClone();
 
-            clone.Cells = Cells.ToDictionary(x => x.Key, x => x.Value.Clone());
+            clone.Cells = Cells?.ToDictionary(x => x.Key, x => x.Value.Clone());
 
             return clone;
         }

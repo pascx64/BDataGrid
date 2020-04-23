@@ -1,4 +1,5 @@
 ﻿using BDataGrid.Library;
+using BDataGrid.Library.Formatters;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,15 @@ namespace BDataGrid.Example.Pages
     {
         public class DataItem
         {
+            public bool Checkbox { get; set; }
+
             public string Name { get; set; }
 
             public string Description { get; set; }
 
             public float Value { get; set; }
+
+            public string? ActionHere { get; set; }
 
             public bool IsGroup { get; set; }
 
@@ -28,6 +33,13 @@ namespace BDataGrid.Example.Pages
 
         public void ConfigureDatagrid(DataGridBuilder<DataItem> builder)
         {
+            builder
+                .Property(p => p.Checkbox)
+                    .HasHeaderText("")
+                    .HasWidth("50px")
+                .Property(p => p.ActionHere)
+                    .HasWidth("150px");
+
             builder
                 .Property(p => p.Name)
                     .HasHeaderText("Name")
@@ -71,6 +83,14 @@ namespace BDataGrid.Example.Pages
                     .HasFooterLocation()
                     .Property(p => p.Value)
                         .HasFormatter(_ => builder.FilteredItems.Sum(x => x.Item.Value).ToString("0.00"));
+
+            builder
+                .If(x => !string.IsNullOrEmpty(x.ActionHere))
+                    .Property(p => p.ActionHere)
+                        .HasButtonFormatter(() =>
+                        {
+                            Console.WriteLine("Clicked!");
+                        });
         }
 
         protected override async Task OnInitializedAsync()
@@ -82,77 +102,91 @@ namespace BDataGrid.Example.Pages
             {
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     IsGroup = true,
                     Name = "group 1",
                     Description = "Group de fou",
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 1",
                     Description = "wouhouuu here here here",
+                    ActionHere = "test",
                     Value = 1
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 2",
                     Description = "sadadawd",
                     Value = 2
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     IsGroup = true,
                     Name = "group 2",
                     Description = "Group de fou adwad",
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 1",
                     Description = "wouhouuu here here here",
                     Value = 3
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 2",
                     Description = "sadadawd",
+                    ActionHere = "test 2",
                     Value = 4
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 3",
                     Description = "sadadawd",
                     Value = 5
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 2",
                     Description = "sadadawd",
                     Value = 6
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     IsGroup = true,
                     Name = "group 3",
                     Description = "Group de fou adwad",
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 1",
                     Description = "wouhouuu here here here",
                     Value = 7
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 2",
                     Description = "sadadawd",
                     Value = 8
                 },
                 new DataItem()
                 {
+                    Checkbox = new Random().Next() % 2 == 0,
                     Name = "sub item 3",
                     Description = "sadadawd",
                     Value = 9
                 }
-            }).Take(80000).Append(new DataItem()
+            }).Take(5000).Append(new DataItem()
             {
                 IsTotal = true
             }).ToList();

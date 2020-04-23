@@ -35,6 +35,8 @@ namespace BDataGrid.Library
 
         public SortDirection? CurrentSortDirection { get; set; }
 
+        public bool AutoWidthExcel { get; set; }
+
         public Func<DataGridColInfo<TItem>, RenderFragment<BDataGrid<TItem>>> FilterRenderFragment { get; set; }
 
         public Func<DataGridColInfo<TItem>, DataGridRowInfo<TItem>, TItem, FilterResult>? FilterMethod { get; set; }

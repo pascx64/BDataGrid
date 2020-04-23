@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -60,6 +61,9 @@ namespace BDataGrid.Library
         public string Width { get; set; } = "100%";
 
         [Parameter]
+        public string ExportFileName { get; set; } = "export";
+
+        [Parameter]
         public string Height { get; set; } = "100%";
 
         public int CurrentTotalPages => (int)Math.Ceiling(Builder.FilteredItems.Count / (float)PageSize);
@@ -78,6 +82,7 @@ namespace BDataGrid.Library
         private ElementReference? TableRef { get; set; }
 
         private bool ItemsChanged { get; set; }
+
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -276,6 +281,26 @@ namespace BDataGrid.Library
 
             if (refresh)
                 StateHasChanged();
+        }
+
+        #endregion
+
+        #region Excel 
+
+        private async Task ExportExcel()
+        {
+            byte[] arr;
+            using (var stream = new MemoryStream())
+            {
+                Builder.ExportExcel(stream);
+
+                stream.Position = 0;
+                arr = stream.ToArray();
+            }
+
+            var str = Convert.ToBase64String(arr);
+
+            await JSRuntime.InvokeVoidAsync("BDataGrid.saveAsFile", ExportFileName + ".xlsx", str);
         }
 
         #endregion

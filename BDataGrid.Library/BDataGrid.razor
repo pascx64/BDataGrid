@@ -3,7 +3,7 @@
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 <div @ref="TableRef" style="position: absolute; overflow: visible; width: @Width; height: @Height">
     <div style="height: 100%; width: 100%; position: relative; display: flex; flex-direction: column">
-        <div style="float: left; overflow:hidden; width: 100%; flex: none">
+        <div style="float: left; overflow:hidden; width: calc(100% - 10px); flex: none">
             <table class="@(BDataGridStyle.TableClass)">
                 <thead class="@(BDataGridStyle.HeaderClass)">
                     <tr class="@(BDataGridStyle.HeaderRowClass)">
@@ -68,8 +68,8 @@
             </table>
         </div>
 
-        <div style="float: left; width: 100%; overflow-x: auto; flex: none">
-            <table class="@(BDataGridStyle.TableClass)" >
+        <div style="float: left; width: calc(100% - 10px); overflow-x: auto; flex: none">
+            <table class="@(BDataGridStyle.TableClass)">
                 <tfoot>
 
                     @for (int i = 0; i < Builder.FooterItems.Count; ++i)
@@ -88,6 +88,7 @@
         </div>
 
         <div style="margin-top: 10px">
+
             @if (CurrentTotalPages > 1)
             {
                 <div class="@BDataGridStyle.PaginationDivClass">
@@ -123,6 +124,13 @@
                 </div>
 
             }
+
+            <div class="@BDataGridStyle.ExportExcelDivClass">
+                <a class="@BDataGridStyle.ExportExcelAClass" @onclick="ExportExcel">
+                    <i class="@BDataGridStyle.ExportExcelIconClass"></i>
+                </a>
+            </div>
+
         </div>
     </div>
 </div>

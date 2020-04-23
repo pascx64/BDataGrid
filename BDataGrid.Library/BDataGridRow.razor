@@ -36,6 +36,10 @@
                 {
                     @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);
                 }
+                else if(cellInfo?.Formatter != null)
+                {
+                    @cellInfo.Formatter(Item)
+                }
                 else
                 {
                     @((cellInfo?.FormatterString ?? col.Value.Formatter)(Item))@(cellInfo?.Append ?? "")

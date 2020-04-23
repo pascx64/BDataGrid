@@ -26,6 +26,12 @@ namespace BDataGrid.Library
 
         string PaginationPageNumberClass { get; set; }
 
+        string ExportExcelDivClass { get; set; }
+
+        string ExportExcelAClass { get; set; }
+
+        string ExportExcelIconClass { get; set; }
+
         string PaginationLeftIcon { get; set; }
 
         string PaginationRightIcon { get; set; }

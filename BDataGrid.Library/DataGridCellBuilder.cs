@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
@@ -54,13 +55,18 @@ namespace BDataGrid.Library
             Actions.Enqueue(action);
             return this;
         }
+
         public virtual void ExecuteActions(DataGridRowInfo<TItem> rowInfo)
         {
             if (rowInfo.Cells == null)
                 rowInfo.Cells = new Dictionary<string, DataGridCellInfo<TItem>>();
 
             if (!rowInfo.Cells.TryGetValue(PropertyName, out var cellInfo))
+            {
                 cellInfo = rowInfo.Cells[PropertyName] = new DataGridCellInfo<TItem>();
+                if (typeof(TProperty) == typeof(bool) || typeof(TProperty) == typeof(bool?))
+                    cellInfo.Formatter = GetFormatter(typeof(Formatters.DataGridFormatter_CheckBox), SelectorFunc);
+            }
 
             foreach (var action in Actions)
                 action(rowInfo, cellInfo);
@@ -212,7 +218,7 @@ namespace BDataGrid.Library
             return AddAction((row, cell) => cell.Append = append);
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasFormatter(Func<TItem, RenderFragment<TItem>> renderFragmentProvider)
+        public DataGridCellBuilder<TItem, TProperty> HasFormatter(Func<TItem, RenderFragment> renderFragmentProvider)
         {
             return AddAction((row, cell) =>
             {
@@ -220,26 +226,57 @@ namespace BDataGrid.Library
             });
         }
 
+        private static Func<TItem, RenderFragment> GetFormatter(Type editorType, Func<TItem, TProperty> selector, Func<TItem, object>? argsProvider = null)
+        {
+            return item =>
+            {
+                return builder =>
+                {
+                    builder.OpenComponent(0, editorType);
+                    builder.AddAttribute(1, "Value", selector(item));
+                    builder.AddAttribute(2, "Item", item);
+                    if (argsProvider != null)
+                    {
+                        var editorArgs = argsProvider(item);
+                        int sequence = 2;
+                        foreach (var property in editorArgs.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                            builder.AddAttribute(++sequence, property.Name, property.GetValue(editorArgs));
+                    }
+                    builder.CloseComponent();
+                };
+            };
+        }
+
         public DataGridCellBuilder<TItem, TProperty> HasFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
         {
-            return HasFormatter(item =>
+            return HasFormatter(GetFormatter(editorType, SelectorFunc, argsProvider));
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasFormatter<TFormatter>(Func<TItem, object>? argsProvider = null)
+            where TFormatter : Formatters.DataGridFormatter
+        {
+            return HasFormatter(typeof(TFormatter), argsProvider);
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasButtonFormatter(Func<TItem, Task> action)
+        {
+            return HasFormatter<Formatters.DataGridFormatter_Button>(item => new
             {
-                return item =>
-                {
-                    return builder =>
-                    {
-                        builder.OpenComponent(0, editorType);
-                        builder.AddAttribute(1, "Args", item);
-                        if (argsProvider != null)
-                        {
-                            var editorArgs = argsProvider(item);
-                            int sequence = 1;
-                            foreach (var property in editorArgs.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-                                builder.AddAttribute(++sequence, property.Name, property.GetValue(editorArgs));
-                        }
-                        builder.CloseComponent();
-                    };
-                };
+                Callback = (Func<object, Task>)(obj => action((TItem)obj))
+            });
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasButtonFormatter(Func<Task> action)
+        {
+            return HasButtonFormatter(_ => action());
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasButtonFormatter(Action action)
+        {
+            return HasButtonFormatter(_ =>
+            {
+                action();
+                return Task.CompletedTask;
             });
         }
     }

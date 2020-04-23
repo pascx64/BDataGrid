@@ -29,5 +29,11 @@ namespace BDataGrid.Library
         public string HeaderSortedAscendingClass { get; set; } = "";
 
         public string HeaderSortedDescendingClass { get; set; } = "";
+
+        public string ExportExcelDivClass { get; set; } = "";
+
+        public string ExportExcelAClass { get; set; } = "";
+
+        public string ExportExcelIconClass { get; set; } = "";
     }
 }

@@ -1,0 +1,12 @@
+﻿@inherits DataGridFormatter
+
+<div>
+    <button @onclick="() => Callback(Item)">@(Value?.ToString() ?? "")</button>
+</div>
+
+@code {
+
+    [Parameter]
+    public Func<object, Task> Callback { get; set; }
+
+}

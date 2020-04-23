@@ -18,7 +18,7 @@ namespace BDataGrid.Library
 
         public string? Append { get; set; }
 
-        public Func<TItem, RenderFragment<TItem>>? Formatter { get; set; }
+        public Func<TItem, RenderFragment>? Formatter { get; set; }
 
         public DataGridEditorInfo<TItem>? EditorInfo { get; set; }
 
