@@ -26,10 +26,10 @@ namespace BDataGrid.Library
         internal bool AllowHeaderSorting { get; set; } = true;
 
         public IReadOnlyList<TItem> Items { get; private set; }
-        public IReadOnlyList<(int Index, TItem Item)> AllBodyItems { get; private set; }
-        public IReadOnlyList<(int Index, TItem Item)> FilteredItems { get; private set; }
-        public IReadOnlyList<(int Index, TItem Item)> HeaderItems { get; private set; }
-        public IReadOnlyList<(int Index, TItem Item)> FooterItems { get; private set; }
+        public IReadOnlyList<(int Index, TItem Item)> AllBodyItems { get; private set; } = new List<(int Index, TItem Item)>();
+        public IReadOnlyList<(int Index, TItem Item)> FilteredItems { get; private set; } = new List<(int Index, TItem Item)>();
+        public IReadOnlyList<(int Index, TItem Item)> HeaderItems { get; private set; } = new List<(int Index, TItem Item)>();
+        public IReadOnlyList<(int Index, TItem Item)> FooterItems { get; private set; } = new List<(int Index, TItem Item)>();
 
         public void Build(IReadOnlyList<TItem> items)
         {
@@ -294,14 +294,7 @@ namespace BDataGrid.Library
             }
 
             ws.Cells[1, 2, rowIndex, Columns.Count + 1].AutoFilter = true;
-            colIndex = 1;
-            foreach (var col in Columns)
-            {
-                if (col.Value.AutoWidthExcel)
-                {
-                    ws.Column(++colIndex).AutoFit();
-                }
-            }
+            ws.Cells[1, 2, rowIndex, Columns.Count + 1].AutoFitColumns();
 
             p.SaveAs(outputStream);
         }
