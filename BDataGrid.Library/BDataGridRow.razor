@@ -25,18 +25,19 @@
             var isSelectedCell = DataGrid.SelectedCell?.Col == col.Value && DataGrid.SelectedCell?.Item == Item;
             var width = @GetWidth(colIndex, colspanToSkip, col.Value);
 
-            <td tabindex="0" colspan="@colspanToSkip.ToString()"
-                style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value));
-                width: calc(@width); min-width: calc(@width)"
-                class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
-                @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
-                @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
+        <td tabindex="0" colspan="@colspanToSkip.ToString()"
+            style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value));
+                width: calc(@width); min-width: calc(@width); max-width: calc(@width);"
+            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
+            @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
+            @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
 
+            <div style="display: block; max-height: 80px; overflow: auto">
                 @if (isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null)
                 {
                     @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);
                 }
-                else if(cellInfo?.Formatter != null)
+                else if (cellInfo?.Formatter != null)
                 {
                     @cellInfo.Formatter(Item)
                 }
@@ -44,8 +45,9 @@
                 {
                     @((cellInfo?.FormatterString ?? col.Value.Formatter)(Item))@(cellInfo?.Append ?? "")
                 }
+            </div>
 
-            </td>
+        </td>
         }
     }
 
