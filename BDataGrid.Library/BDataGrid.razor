@@ -15,7 +15,7 @@
                                  SortDirection.Ascending => BDataGridStyle.HeaderSortedAscendingClass,
                                  SortDirection.Descending => BDataGridStyle.HeaderSortedDescendingClass,
                                  _ => ""
-                             })" style="width: @width; min-width: @width">
+                             })" style="width: @width; min-width: @width; max-width: @width">
                                 @(col.Value.HeaderText ?? "Unknowned header")
                             </th>
                         }
