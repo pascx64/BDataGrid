@@ -237,20 +237,24 @@ namespace BDataGrid.Library
 
             if (keyCode == 38) // up
             {
-                var currentIndex = Items.IndexOf(SelectedCell.Item);
-                if (currentIndex <= 0)
+                var currentRow = Builder.FilteredItems.FirstOrDefault( x=> x.Item == SelectedCell.Item);
+                if (currentRow == default || currentRow.Index <= 0)
                     return;
 
-                await SelectedCellFromClient(Items[currentIndex - 1], FindColUnderCell(currentIndex - 1, SelectedCell.Col.Id));
+                var filteredIndex = Builder.FilteredItems.IndexOf(currentRow);
+                var nextRow = Builder.FilteredItems[filteredIndex - 1];
+                await SelectedCellFromClient(nextRow.Item, FindColUnderCell(nextRow.Index, SelectedCell.Col.Id));
 
             }
             else if (keyCode == 40) // down
             {
-                var currentIndex = Items.IndexOf(SelectedCell.Item);
-                if (currentIndex == -1 || currentIndex + 1 == Items.Count)
+                var currentRow = Builder.FilteredItems.FirstOrDefault( x=> x.Item == SelectedCell.Item);
+                if (currentRow == default || currentRow.Index == -1 || currentRow.Index + 1 == Items.Count)
                     return;
 
-                await SelectedCellFromClient(Items[currentIndex + 1], FindColUnderCell(currentIndex + 1, SelectedCell.Col.Id));
+                var filteredIndex = Builder.FilteredItems.IndexOf(currentRow);
+                var nextRow = Builder.FilteredItems[filteredIndex + 1];
+                await SelectedCellFromClient(nextRow.Item, FindColUnderCell(nextRow.Index, SelectedCell.Col.Id));
             }
             else if (keyCode == 39) // right 
             {
