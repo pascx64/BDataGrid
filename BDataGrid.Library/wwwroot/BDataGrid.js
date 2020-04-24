@@ -53,7 +53,7 @@ var BDataGrid;
                 }
             });
             document.addEventListener('mouseup', function (e) {
-                if (curCol && currentDotNet && currentColIndex) {
+                if (curCol && currentDotNet && currentColIndex >= 0) {
                     datagridDotnet.invokeMethodAsync('OnColResizedFromClient', currentColIndex, curCol.style.width);
                     curCol = undefined;
                     pageX = undefined;
