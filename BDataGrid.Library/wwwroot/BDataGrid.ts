@@ -76,6 +76,8 @@ namespace BDataGrid {
                     curColWidth = undefined;
                     currentColIndex = undefined;
                     currentDotNet = undefined;
+
+                    e.preventDefault();
                 }
             });
         }
@@ -122,6 +124,10 @@ namespace BDataGrid {
 
             e.preventDefault();
         });
+
+        div.onclick = function (ev) {
+            ev.stopImmediatePropagation();
+        }
     }
     export function saveAsFile(filename, bytesBase64) {
         if (navigator.msSaveBlob) {

@@ -60,6 +60,7 @@ var BDataGrid;
                     curColWidth = undefined;
                     currentColIndex = undefined;
                     currentDotNet = undefined;
+                    e.preventDefault();
                 }
             });
         }
@@ -100,6 +101,9 @@ var BDataGrid;
             currentDotNet = dotnet;
             e.preventDefault();
         });
+        div.onclick = function (ev) {
+            ev.stopImmediatePropagation();
+        };
     }
     function saveAsFile(filename, bytesBase64) {
         if (navigator.msSaveBlob) {

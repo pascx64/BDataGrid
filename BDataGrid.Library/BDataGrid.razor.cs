@@ -294,13 +294,14 @@ namespace BDataGrid.Library
         [JSInvokable]
         public void OnColResizedFromClient(int colIndex, string width)
         {
-            Builder.Rebuild();
-
             var col = Builder.Columns.Values.ElementAtOrDefault(colIndex);
             if (col == null)
                 return;
 
-            col.Width = width;
+            col.ForcedWidth = width;
+
+            Builder.Rebuild();
+
 
             StateHasChanged();
         }

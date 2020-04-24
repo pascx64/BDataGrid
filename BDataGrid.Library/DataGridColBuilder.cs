@@ -45,6 +45,7 @@ namespace BDataGrid.Library
                     ValueSelector = x => SelectorFunc(x),
                     HeaderText = PropertyName,
                     Formatter = x => SelectorFunc(x)?.ToString() ?? "",
+                    PropertyType = typeof(TItem),
                     ValueSet = SetFunc,
                     FilterRenderFragment = GetFilterFormatter(typeof(Filters.DataGridCellFilter_Textbox), null),
                     AutoWidthExcel = true

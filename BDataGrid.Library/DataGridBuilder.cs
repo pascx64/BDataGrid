@@ -35,14 +35,15 @@ namespace BDataGrid.Library
         {
             Items = items ?? new List<TItem>();
 
-            Rebuild();
+            Rebuild(true);
         }
 
-        public void Rebuild()
+        public void Rebuild(bool clearColumns = false)
         {
             RowInfos.Clear();
             RowInfos.Capacity = Items.Count;
-            Columns.Clear();
+            if (clearColumns)
+                Columns.Clear();
             ShowHeaderFilters = false;
 
             GlobalRowInfo = new DataGridRowInfo<TItem>();

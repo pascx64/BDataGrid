@@ -18,18 +18,26 @@ namespace BDataGrid.Library
     public class DataGridColInfo<TItem>
         where TItem : class
     {
-
         public string Id { get; set; }
 
         public string? HeaderText { get; set; }
 
-        public string? Width { get; set; }
+        private string? Width_;
+        public string? Width
+        {
+            get => ForcedWidth ?? Width_;
+            set => Width_ = value;
+        }
+
+        public string? ForcedWidth { get; set; }
 
         public Action<TItem, object?>? ValueSet { get; set; }
 
         public Func<TItem, object?> ValueSelector { get; set; }
 
         public Func<TItem, string> Formatter { get; set; }
+
+        public Type PropertyType { get; set; }
 
         public object? CurrentFilterValue { get; set; }
 
