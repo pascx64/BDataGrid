@@ -125,5 +125,13 @@ namespace BDataGrid.Library
             return this;
         }
 
+        public DataGridRowBuilder<TItem> HasForcedRefresh(bool? value = true)
+        {
+            AddAction( rowInfo => rowInfo.ForceRefresh = value);
+
+            return this;
+        }
+
+
     }
 }

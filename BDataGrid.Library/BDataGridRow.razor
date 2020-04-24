@@ -131,7 +131,7 @@
 
     protected override bool ShouldRender()
     {
-        return ShouldRefresh || IsRowSelected;
+        return RowInfo.ForceRefresh == true || ShouldRefresh || IsRowSelected;
     }
 
 }

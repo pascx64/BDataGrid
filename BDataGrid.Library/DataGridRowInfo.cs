@@ -20,6 +20,8 @@ namespace BDataGrid.Library
 
         public RowLocation? RowLocation { get; set; }
 
+        public bool? ForceRefresh { get; set; }
+
         public Dictionary<string, DataGridCellInfo<TItem>>? Cells { get; set; }
 
         public DataGridRowInfo<TItem> Clone()
