@@ -195,7 +195,6 @@ namespace BDataGrid.Library
                 return;
 
             await OpenEditor(SelectedCell.Item, SelectedCell.Col, key == "" ? null : key);
-
         }
 
         #endregion
@@ -243,6 +242,7 @@ namespace BDataGrid.Library
                     return;
 
                 await SelectedCellFromClient(Items[currentIndex - 1], FindColUnderCell(currentIndex - 1, SelectedCell.Col.Id));
+
             }
             else if (keyCode == 40) // down
             {
@@ -278,7 +278,7 @@ namespace BDataGrid.Library
             else
                 refresh = false;
 
-
+            
             if (refresh)
                 StateHasChanged();
         }

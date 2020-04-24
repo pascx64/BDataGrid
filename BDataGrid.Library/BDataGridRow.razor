@@ -25,29 +25,29 @@
             var isSelectedCell = DataGrid.SelectedCell?.Col == col.Value && DataGrid.SelectedCell?.Item == Item;
             var width = @GetWidth(colIndex, colspanToSkip, col.Value);
 
-        <td tabindex="0" colspan="@colspanToSkip.ToString()"
-            style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value));
+            <td tabindex="0" colspan="@colspanToSkip.ToString()"
+                style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value));
                 width: calc(@width); min-width: calc(@width); max-width: calc(@width);"
-            class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
-            @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
-            @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
+                class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
+                @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
+                @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
 
-            <div style="display: block; max-height: 80px; overflow: auto">
-                @if (isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null)
-                {
-                    @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);
-                }
-                else if (cellInfo?.Formatter != null)
-                {
-                    @cellInfo.Formatter(Item)
-                }
-                else
-                {
-                    @((cellInfo?.FormatterString ?? col.Value.Formatter)(Item))@(cellInfo?.Append ?? "")
-                }
-            </div>
+                <div style="display: block; max-height: 80px; overflow: auto">
+                    @if (isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null)
+                    {
+                        @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);
+                    }
+                    else if (cellInfo?.Formatter != null)
+                    {
+                        @cellInfo.Formatter(Item)
+                    }
+                    else
+                    {
+                        @((cellInfo?.FormatterString ?? col.Value.Formatter)(Item))@(cellInfo?.Append ?? "")
+                    }
+                </div>
 
-        </td>
+            </td>
         }
     }
 
@@ -55,20 +55,83 @@
 
 @code {
 
-    [Parameter]
-    public DataGridRowInfo<TItem> RowInfo { get; set; }
+    private bool IsRowSelected { get; set; } = false;
 
-    [Parameter]
-    public BDataGrid<TItem> DataGrid { get; set; }
+    private bool ShouldRefresh { get; set; } = false;
 
+    private DataGridRowInfo<TItem> RowInfo_;
     [Parameter]
-    public TItem Item { get; set; }
+    public DataGridRowInfo<TItem> RowInfo
+    {
+        get => RowInfo_;
+        set
+        {
+            if (RowInfo_ != value)
+            {
+                RowInfo_ = value;
+                ShouldRefresh = true;
+            }
+        }
+    }
+
+    private BDataGrid<TItem> DataGrid_;
+    [Parameter]
+    public BDataGrid<TItem> DataGrid
+    {
+        get => DataGrid_;
+        set
+        {
+            if (DataGrid_ != value)
+            {
+                DataGrid_ = value;
+                ShouldRefresh = true;
+            }
+        }
+    }
+
+    private TItem Item_;
+    [Parameter]
+    public TItem Item
+    {
+        get => Item_;
+        set
+        {
+            if (Item_ != value)
+            {
+                Item_ = value;
+                ShouldRefresh = true;
+            }
+        }
+    }
 
     private string GetWidth(int colIndex, int colSpan, DataGridColInfo<TItem> col)
     {
         var allWidths = DataGrid.Builder.Columns.Skip(colIndex).Take(colSpan).Select(col => col.Value.Width ?? ((100f / DataGrid.Builder.Columns.Count) + "%"));
 
         return string.Join(" + ", allWidths);
+    }
+
+    protected override void OnParametersSet()
+    {
+        var isRowSelected = DataGrid.SelectedCell?.Item == Item;
+        if (isRowSelected != IsRowSelected)
+            ShouldRefresh = true;
+
+        IsRowSelected = isRowSelected;
+
+        base.OnParametersSet();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        ShouldRefresh = false;
+
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override bool ShouldRender()
+    {
+        return ShouldRefresh || IsRowSelected;
     }
 
 }

@@ -43,7 +43,7 @@
                         var rowInfo = Builder.RowInfos[itemAndIndex.Index] ?? Builder.GlobalRowInfo;
 
 
-                        <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
+                        <BDataGridRow @key="item" TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
                     }
                 </tbody>
             </table>
@@ -60,7 +60,7 @@
                         var rowInfo = Builder.RowInfos[itemAndIndex.Index] ?? Builder.GlobalRowInfo;
 
 
-                        <BDataGridRow TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
+                        <BDataGridRow @key="item" TItem="TItem" DataGrid="this" Item="item" RowInfo="rowInfo"></BDataGridRow>
                     }
 
                 </tbody>
