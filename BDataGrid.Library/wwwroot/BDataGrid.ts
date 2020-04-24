@@ -109,7 +109,7 @@ namespace BDataGrid {
         div.style.cursor = 'col-resize';
         div.style.userSelect = 'none';
         /* table height */
-        div.style.height = height + 'px';
+        div.style.height = height + 'px !important';
         return div;
     }
     function setListeners(index, div: HTMLDivElement, dotnet) {
