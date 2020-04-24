@@ -1,5 +1,7 @@
 ﻿declare var $: any;
 namespace BDataGrid {
+    var pageX, curCol, currentColIndex, curColWidth, alreadyBinded = false, currentDotNet: any;
+
     export function focus(element: HTMLBaseElement, additionalSelector?: string) {
 
         if (additionalSelector) {
@@ -53,9 +55,74 @@ namespace BDataGrid {
             bodyTable.parentElement.scrollLeft = (this as any).scrollLeft;
         }
 
+        if (!alreadyBinded) {
+            alreadyBinded = true;
+            document.addEventListener('mousemove', function (e) {
+                if (curCol) {
+                    var diffX = e.pageX - pageX;
+
+                    curCol.style.width = (curColWidth + diffX) + 'px';
+                    curCol.style.minWidth = curCol.style.width;
+                    curCol.style.maxWidth = curCol.style.width;
+                }
+            });
+
+            document.addEventListener('mouseup', function (e) {
+                if (curCol && currentDotNet && currentColIndex) {
+                    datagridDotnet.invokeMethodAsync('OnColResizedFromClient', currentColIndex, curCol.style.width);
+
+                    curCol = undefined;
+                    pageX = undefined;
+                    curColWidth = undefined;
+                    currentColIndex = undefined;
+                    currentDotNet = undefined;
+                }
+            });
+        }
+        resizableGrid(headerTable as any, datagridDotnet);
+
+
         return true;
     }
 
+    function resizableGrid(table: HTMLTableElement, dotnet: any) {
+        var row = table.getElementsByTagName('tr')[0];
+        var cols = row ? row.children : undefined;
+
+        if (!cols)
+            return;
+
+        for (var i = 0; i < cols.length; i++) {
+            var div = createDiv(table.offsetHeight);
+            cols[i].appendChild(div);
+            (cols[i] as any).style.position = 'relative';
+            setListeners(i, div, dotnet);
+        }
+    }
+
+    function createDiv(height) {
+        var div = document.createElement('div') as any;
+        div.style.top = 0;
+        div.style.right = 0;
+        div.style.width = '5px';
+        div.style.position = 'absolute';
+        div.style.cursor = 'col-resize';
+        div.style.userSelect = 'none';
+        /* table height */
+        div.style.height = height + 'px';
+        return div;
+    }
+    function setListeners(index, div: HTMLDivElement, dotnet) {
+        div.addEventListener('mousedown', function (e) {
+            curCol = (e.target as any).parentElement;
+            pageX = e.pageX;
+            curColWidth = curCol.offsetWidth
+            currentColIndex = index;
+            currentDotNet = dotnet;
+
+            e.preventDefault();
+        });
+    }
     export function saveAsFile(filename, bytesBase64) {
         if (navigator.msSaveBlob) {
             //Download document in Edge browser

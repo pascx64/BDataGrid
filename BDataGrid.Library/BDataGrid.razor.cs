@@ -289,6 +289,23 @@ namespace BDataGrid.Library
 
         #endregion
 
+        #region Col size changed
+
+        [JSInvokable]
+        public void OnColResizedFromClient(int colIndex, string width)
+        {
+            Builder.Rebuild();
+
+            var col = Builder.Columns.Values.ElementAtOrDefault(colIndex);
+            if (col == null)
+                return;
+
+            col.Width = width;
+
+            StateHasChanged();
+        }
+        #endregion
+
         #region Excel 
 
         private async Task ExportExcel()

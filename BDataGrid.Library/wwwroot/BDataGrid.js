@@ -1,5 +1,6 @@
 var BDataGrid;
 (function (BDataGrid) {
+    var pageX, curCol, currentColIndex, curColWidth, alreadyBinded = false, currentDotNet;
     function focus(element, additionalSelector) {
         if (additionalSelector) {
             $(element).find(additionalSelector)[0].focus();
@@ -41,9 +42,65 @@ var BDataGrid;
             headerTable.parentElement.scrollLeft = this.scrollLeft;
             bodyTable.parentElement.scrollLeft = this.scrollLeft;
         };
+        if (!alreadyBinded) {
+            alreadyBinded = true;
+            document.addEventListener('mousemove', function (e) {
+                if (curCol) {
+                    var diffX = e.pageX - pageX;
+                    curCol.style.width = (curColWidth + diffX) + 'px';
+                    curCol.style.minWidth = curCol.style.width;
+                    curCol.style.maxWidth = curCol.style.width;
+                }
+            });
+            document.addEventListener('mouseup', function (e) {
+                if (curCol && currentDotNet && currentColIndex) {
+                    datagridDotnet.invokeMethodAsync('OnColResizedFromClient', currentColIndex, curCol.style.width);
+                    curCol = undefined;
+                    pageX = undefined;
+                    curColWidth = undefined;
+                    currentColIndex = undefined;
+                    currentDotNet = undefined;
+                }
+            });
+        }
+        resizableGrid(headerTable, datagridDotnet);
         return true;
     }
     BDataGrid.initializeDatagrid = initializeDatagrid;
+    function resizableGrid(table, dotnet) {
+        var row = table.getElementsByTagName('tr')[0];
+        var cols = row ? row.children : undefined;
+        if (!cols)
+            return;
+        for (var i = 0; i < cols.length; i++) {
+            var div = createDiv(table.offsetHeight);
+            cols[i].appendChild(div);
+            cols[i].style.position = 'relative';
+            setListeners(i, div, dotnet);
+        }
+    }
+    function createDiv(height) {
+        var div = document.createElement('div');
+        div.style.top = 0;
+        div.style.right = 0;
+        div.style.width = '5px';
+        div.style.position = 'absolute';
+        div.style.cursor = 'col-resize';
+        div.style.userSelect = 'none';
+        /* table height */
+        div.style.height = height + 'px';
+        return div;
+    }
+    function setListeners(index, div, dotnet) {
+        div.addEventListener('mousedown', function (e) {
+            curCol = e.target.parentElement;
+            pageX = e.pageX;
+            curColWidth = curCol.offsetWidth;
+            currentColIndex = index;
+            currentDotNet = dotnet;
+            e.preventDefault();
+        });
+    }
     function saveAsFile(filename, bytesBase64) {
         if (navigator.msSaveBlob) {
             //Download document in Edge browser
