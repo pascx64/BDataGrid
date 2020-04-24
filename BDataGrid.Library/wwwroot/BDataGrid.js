@@ -88,7 +88,7 @@ var BDataGrid;
         div.style.cursor = 'col-resize';
         div.style.userSelect = 'none';
         /* table height */
-        div.style.height = height + 'px !important';
+        div.style.height = '100%';
         return div;
     }
     function setListeners(index, div, dotnet) {
