@@ -227,6 +227,7 @@ namespace BDataGrid.Library
 
             throw new Exception("Couldn't find col:" + col);
         }
+
         [JSInvokable]
         public async Task OnArrowKeysPressed(int keyCode)
         {

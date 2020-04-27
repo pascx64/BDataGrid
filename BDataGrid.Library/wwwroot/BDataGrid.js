@@ -15,10 +15,14 @@ var BDataGrid;
         var footerTable = $(element).find('table')[2];
         var scrollBar = $(element).find('.scrollBarDiv')[0];
         bodyTable.onkeydown = function (ev) {
-            if (ev.keyCode >= 37 && ev.keyCode <= 40) { // arrows keys
+            if (ev.keyCode == 9 || // tab
+                (ev.keyCode >= 37 && ev.keyCode <= 40)) { // arrows keys
                 ev.preventDefault();
                 ev.stopPropagation();
-                datagridDotnet.invokeMethodAsync('OnArrowKeysPressed', ev.keyCode);
+                if (ev.keyCode == 9)
+                    datagridDotnet.invokeMethodAsync('OnArrowKeysPressed', ev.shiftKey ? 37 : 39); // simulate 'left' and 'right' arrow key
+                else
+                    datagridDotnet.invokeMethodAsync('OnArrowKeysPressed', ev.keyCode);
                 return false;
             }
             var key = ev.key;
