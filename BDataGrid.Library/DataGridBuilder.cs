@@ -241,10 +241,10 @@ namespace BDataGrid.Library
 
             var ws = p.Workbook.Worksheets.Add("Sheet");
 
-            ws.Cells[1, 2, 1, Columns.Count + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-            ws.Cells[1, 2, 1, Columns.Count + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#5A5A5A"));
+            ws.Cells[1, 2, 1, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            ws.Cells[1, 2, 1, Columns.Count].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#5A5A5A"));
 
-            int colIndex = 1;
+            int colIndex = 0;
             foreach (var col in Columns)
             {
                 var header = col.Value.HeaderText;
@@ -261,13 +261,13 @@ namespace BDataGrid.Library
             {
                 var rowInfo = RowInfos[row.Index];
                 int colSpanLeft = 1;
-                colIndex = 1;
+                colIndex = 0;
                 var rowStart = ++rowIndex;
 
                 if (rowStart % 2 == 0)
                 {
-                    ws.Cells[rowStart, colIndex + 1, rowStart, Columns.Count + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    ws.Cells[rowStart, colIndex + 1, rowStart, Columns.Count + 1].Style.Fill.BackgroundColor.SetColor(oddColor);
+                    ws.Cells[rowStart, colIndex, rowStart, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    ws.Cells[rowStart, colIndex, rowStart, Columns.Count].Style.Fill.BackgroundColor.SetColor(oddColor);
                 }
 
                 foreach (var col in Columns)
@@ -283,7 +283,13 @@ namespace BDataGrid.Library
                     colSpanLeft = cellInfo?.ColSpan ?? 1;
                     var excelCell = ws.Cells[rowStart, colStart, rowStart, colStart + colSpanLeft - 1];
 
-                    excelCell.Value = (cellInfo?.FormatterString ?? col.Value.Formatter)(row.Item);
+                    var valueStr = (cellInfo?.FormatterString ?? col.Value.Formatter)(row.Item);
+
+                    if (double.TryParse(valueStr, out var valueDouble))
+                        excelCell.Value = valueDouble;
+                    else
+                        excelCell.Value = valueStr;
+
                     excelCell.Merge = true;
 
                     if (cellInfo?.BackgroundColor != null)
@@ -294,8 +300,8 @@ namespace BDataGrid.Library
                 }
             }
 
-            ws.Cells[1, 2, rowIndex, Columns.Count + 1].AutoFilter = true;
-            ws.Cells[1, 2, rowIndex, Columns.Count + 1].AutoFitColumns();
+            ws.Cells[1, 2, rowIndex, Columns.Count].AutoFilter = true;
+            ws.Cells[1, 2, rowIndex, Columns.Count].AutoFitColumns();
 
             p.SaveAs(outputStream);
         }

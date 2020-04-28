@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BDataGrid.Library
@@ -12,17 +13,19 @@ namespace BDataGrid.Library
     public class DataGridRowInfo<TItem>
         where TItem: class
     {
-        public System.Drawing.Color? BackgroundColor { get; set; }
+        public System.Drawing.Color? BackgroundColor { get; internal set; }
 
-        public string? Classes { get; set; }
+        public string? Classes { get; internal set; }
 
-        public bool? IsReadOnly { get; set; }
+        public bool? IsReadOnly { get; internal set; }
 
-        public RowLocation? RowLocation { get; set; }
+        public RowLocation? RowLocation { get; internal set; }
 
-        public bool? ForceRefresh { get; set; }
+        public bool? ForceRefresh { get; internal set; }
 
-        public Dictionary<string, DataGridCellInfo<TItem>>? Cells { get; set; }
+        public Func<TItem, DataGridColInfo<TItem>>? OnCellValueChanged { get; internal set; }
+
+        public Dictionary<string, DataGridCellInfo<TItem>>? Cells { get; internal set; }
 
         public DataGridRowInfo<TItem> Clone()
         {

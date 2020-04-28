@@ -12,6 +12,10 @@ namespace BDataGrid.Library
 
         public string? FirstCharacter { get; set; }
 
-        public Func<Task>? ForceAccept { get; set; }
+        public Func<Task<bool>>? ForceAccept { get; set; }
+
+        public Func<object, Task<bool>> TryAcceptChanges { get; internal set; }
+
+        public EventCallback CancelAndCloseEditor { get; internal set; }
     }
 }

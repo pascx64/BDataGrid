@@ -12,7 +12,7 @@
     private async Task OnKeyDown(KeyboardEventArgs ev)
     {
         if (ev.Key == "Enter")
-            await AcceptChanges.InvokeAsync(Text);
+            await Args.TryAcceptChanges(Text);
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -21,6 +21,7 @@
 
         if (firstRender)
         {
+            // this is done in the After Render so that we only do it in the firstRender
             if (Args.Value != null && !(Args.Value is string str))
                 throw new Exception("Text editor can only be used with string");
 
@@ -29,7 +30,7 @@
             else
                 Text = (string?)Args.Value ?? "";
 
-            Args.ForceAccept = () => AcceptChanges.InvokeAsync(Text);
+            Args.ForceAccept = () => Args.TryAcceptChanges(Text);
 
             StateHasChanged();
 

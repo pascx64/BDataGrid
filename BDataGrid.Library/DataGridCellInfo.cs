@@ -3,6 +3,23 @@ using System;
 
 namespace BDataGrid.Library
 {
+    public struct ValidationResult
+    {
+        public ValidationResult(bool isValid, string? errorMessage = null)
+        {
+            IsValid = isValid;
+            ErrorMessage = errorMessage;
+        }
+
+        public ValidationResult(string errorMessage) : this(false, errorMessage)
+        {
+        }
+
+        public bool IsValid { get; set; }
+
+        public string? ErrorMessage { get; set; }
+    }
+
     public class DataGridCellInfo<TItem>
         where TItem : class
     {
@@ -21,6 +38,8 @@ namespace BDataGrid.Library
         public Func<TItem, RenderFragment>? Formatter { get; set; }
 
         public DataGridEditorInfo<TItem>? EditorInfo { get; set; }
+
+        public Func<TItem, object?, ValidationResult>? Validator { get; set; }
 
         public DataGridCellInfo<TItem> Clone()
         {

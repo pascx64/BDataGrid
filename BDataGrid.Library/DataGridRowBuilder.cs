@@ -9,7 +9,7 @@ namespace BDataGrid.Library
     {
         protected DataGridRowBuilder<TItem> LastFlow { get; }
 
-        internal DataGridBuilder<TItem> DataGridBuilder { get; }
+        public DataGridBuilder<TItem> DataGridBuilder { get; }
 
         public DataGridRowBuilder(DataGridBuilder<TItem>? dataGridBuilder, DataGridRowBuilder<TItem>? lastFlow)
         {

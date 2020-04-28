@@ -11,12 +11,16 @@ namespace BDataGrid.Library
         where TItem : class
     {
         protected Expression<Func<TItem, TProperty>> Selector { get; set; }
+
         protected string PropertyName { get; private set; }
-        private DataGridRowBuilder<TItem> DataGridRowBuilder { get; set; }
+
+        public DataGridRowBuilder<TItem> DataGridRowBuilder { get; }
 
         protected readonly Func<TItem, TProperty> SelectorFunc;
 
         protected readonly Action<TItem, object?> SetFunc;
+
+        private readonly Func<object?, TProperty> ConvertToProperty;
 
 
         public DataGridCellBuilder(Expression<Func<TItem, TProperty>> selector, DataGridRowBuilder<TItem> dataGridRowBuilder)
@@ -47,6 +51,51 @@ namespace BDataGrid.Library
             }
             else
                 throw new Exception("Unable to determine member access :" + selector.ToString());
+
+
+            ConvertToProperty = obj =>
+            {
+                var type = typeof(TProperty);
+                var realType = type;
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    realType = Nullable.GetUnderlyingType(type);
+
+                if (obj == null)
+                {
+                    if (type == realType)
+                    {
+                        if (!type.IsClass)
+                            throw new Exception("null cannot be converted to type:" + type);
+#pragma warning disable CS8603 // Possible null reference return.
+                        return default;
+#pragma warning restore CS8603 // Possible null reference return.
+                    }
+                    else
+                        return (TProperty)Activator.CreateInstance(type);
+                }
+
+                object returnValue;
+                if (realType == obj.GetType())
+                    returnValue = obj;
+                else if (realType == typeof(string))
+                    returnValue = obj.ToString();
+                else if (realType == typeof(float) || realType == typeof(double) || realType == typeof(int) || realType == typeof(uint) || realType == typeof(decimal)
+                    || realType == typeof(short) || realType == typeof(byte))
+                    returnValue = Convert.ChangeType(obj, realType);
+                else if (realType == typeof(bool))
+                {
+                    if (obj is bool b)
+                        returnValue = b;
+                    else
+                        throw new Exception("Cannot convert to bool from type:" + type);
+                }
+                else
+                    throw new Exception("Cannot convert object to type:" + type);
+
+                if (realType != type)
+                    returnValue = Activator.CreateInstance(type, returnValue);
+                return (TProperty)returnValue;
+            };
         }
         private readonly Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>> Actions = new Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>>();
 
@@ -278,6 +327,43 @@ namespace BDataGrid.Library
                 action();
                 return Task.CompletedTask;
             });
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasValidator(Func<TItem, TProperty, ValidationResult> validator)
+        {
+            return AddAction((row, cell) =>
+            {
+                var previousValidator = cell.Validator;
+                cell.Validator = (item, obj) =>
+                {
+                    if( previousValidator != null )
+                    {
+                        var previousResult = previousValidator(item, obj);
+                        if (!previousResult.IsValid)
+                            return previousResult;
+                    }
+
+                    return validator(item, ConvertToProperty(obj));
+                };
+            });
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasValidator(Func<TProperty, ValidationResult> validator)
+        {
+            return HasValidator((_, property) => validator(property));
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasNewValidator(Func<TItem, TProperty, ValidationResult>? validator)
+        {
+            return AddAction((row, cell) =>
+            {
+                cell.Validator = validator == null ? null : (Func<TItem, object?, ValidationResult>?)((item, obj) => validator(item, ConvertToProperty(obj)));
+            });
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasNewValidator(Func< TProperty, ValidationResult>? validator)
+        {
+            return HasValidator((_, property) => validator?.Invoke(property) ?? new ValidationResult(true));
         }
     }
 }
