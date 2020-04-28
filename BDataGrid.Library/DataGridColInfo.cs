@@ -45,7 +45,7 @@ namespace BDataGrid.Library
 
         public bool AutoWidthExcel { get; set; }
 
-        public Func<DataGridColInfo<TItem>, RenderFragment<BDataGrid<TItem>>> FilterRenderFragment { get; set; }
+        public RenderFragment<BDataGrid<TItem>> FilterRenderFragment { get; set; }
 
         public Func<DataGridColInfo<TItem>, DataGridRowInfo<TItem>, TItem, FilterResult>? FilterMethod { get; set; }
     }

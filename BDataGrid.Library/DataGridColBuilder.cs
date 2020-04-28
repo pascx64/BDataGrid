@@ -39,7 +39,7 @@ namespace BDataGrid.Library
             DataGridColInfo<TItem> colInfo;
             if (!GridBuilder.Columns.TryGetValue(PropertyName, out var colInfo_) || colInfo_ == null)
             {
-                colInfo = GridBuilder.Columns[PropertyName] = new DataGridColInfo<TItem>()
+                colInfo = GridBuilder.Columns_[PropertyName] = new DataGridColInfo<TItem>()
                 {
                     Id = PropertyName,
                     ValueSelector = x => SelectorFunc(x),
@@ -47,9 +47,9 @@ namespace BDataGrid.Library
                     Formatter = x => SelectorFunc(x)?.ToString() ?? "",
                     PropertyType = typeof(TItem),
                     ValueSet = SetFunc,
-                    FilterRenderFragment = GetFilterFormatter(typeof(Filters.DataGridCellFilter_Textbox), null),
                     AutoWidthExcel = true
                 };
+                colInfo.FilterRenderFragment = GetFilterFormatter(typeof(Filters.DataGridCellFilter_Textbox), null)(colInfo);
             }
             else
                 colInfo = colInfo_;
@@ -74,10 +74,12 @@ namespace BDataGrid.Library
         {
             return AddAction(col => col.FilterMethod = method);
         }
+
         public DataGridColBuilder<TItem, TProperty> HasFilterFormatter(Func<DataGridColInfo<TItem>, RenderFragment<BDataGrid<TItem>>> renderFragmentProvider)
         {
-            return AddAction((col) => col.FilterRenderFragment = renderFragmentProvider);
+            return AddAction((col) => col.FilterRenderFragment = renderFragmentProvider(col));
         }
+
         private Func<DataGridColInfo<TItem>, RenderFragment<BDataGrid<TItem>>> GetFilterFormatter(Type editorType, object? args)
         {
             return col =>
@@ -106,11 +108,12 @@ namespace BDataGrid.Library
             };
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasFilterFormatter(Type editorType, object? editorArgs = null)
+        public DataGridColBuilder<TItem, TProperty> HasFilterFormatter(Type editorType, object? editorArgs = null)
         {
             return HasFilterFormatter(GetFilterFormatter(editorType, editorArgs));
         }
-        public DataGridCellBuilder<TItem, TProperty> HasFilterFormatter<TFilter>(object? editorArgs = null)
+
+        public DataGridColBuilder<TItem, TProperty> HasFilterFormatter<TFilter>(object? editorArgs = null)
             where TFilter : Filters.DataGridCellFilterBase
         {
             return HasFilterFormatter(typeof(TFilter), editorArgs);

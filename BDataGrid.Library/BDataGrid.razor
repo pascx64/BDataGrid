@@ -2,8 +2,9 @@
 @inject IBDataGridStyle BDataGridStyle
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 <div @ref="TableRef" style="position: absolute; overflow: visible; width: @Width; height: @Height">
-    <div style="height: 100%; width: 100%; position: relative; display: flex; flex-direction: column">
-        <div style="float: left; overflow:hidden; width: calc(100% - 10px); flex: none">
+    <div style="height: calc(100% + @HeaderPadding); width: 100%; position: relative; display: flex; flex-direction: column">
+
+        <div style="float: left; overflow:hidden; width: calc(100% - 10px); flex: none; padding-bottom: @HeaderPadding">
             <table class="@(BDataGridStyle.TableClass)">
                 <thead class="@(BDataGridStyle.HeaderClass)">
                     <tr class="@(BDataGridStyle.HeaderRowClass)">
@@ -26,8 +27,9 @@
                         <tr @onclick="() => SelectedCellFromClient(null, null, false)" @onclick:stopPropagation="true">
                             @foreach (var col in Builder.Columns)
                             {
+                                var width = col.Value.Width == null ? (100 / Builder.Columns.Count) + "%" : col.Value.Width;
                                 <th>
-                                    @col.Value.FilterRenderFragment(col.Value)(this)
+                                    @col.Value.FilterRenderFragment(this)
                                 </th>
                             }
                         </tr>
@@ -47,7 +49,8 @@
                 </tbody>
             </table>
         </div>
-        <div style="float: left; height: 100%; width: inherit; overflow-y: scroll; overflow-x: hidden">
+
+        <div style="float: left; height: 100%; width: inherit; overflow-y: scroll; overflow-x: hidden; position: relative; top: -@(HeaderPadding)">
             <table class="@(BDataGridStyle.TableClass)">
 
                 <tbody>
@@ -67,7 +70,7 @@
             </table>
         </div>
 
-        <div style="float: left; width: calc(100% - 10px); overflow-x: auto; flex: none">
+        <div style="float: left; width: calc(100% - 10px); overflow-x: auto; flex: none; position: relative; top: -@(HeaderPadding)">
             <table class="@(BDataGridStyle.TableClass)">
                 <tfoot>
 
@@ -86,7 +89,7 @@
             <div class="scrollBarDiv" style="height: 1px"></div>
         </div>
 
-        <div style="margin-top: 10px">
+        <div style="margin-top: 10px; position: relative; top: -@(HeaderPadding)">
 
             @if (CurrentTotalPages > 1)
             {

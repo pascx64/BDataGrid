@@ -73,7 +73,7 @@ namespace BDataGrid {
 
             document.addEventListener('mouseup', function (e) {
                 if (curCol && currentDotNet && currentColIndex >= 0) {
-                    datagridDotnet.invokeMethodAsync('OnColResizedFromClient', currentColIndex, curCol.style.width);
+                    datagridDotnet.invokeMethodAsync('OnColResizedFromClient', currentColIndex, $(curCol).outerWidth() + "px");
 
                     curCol = undefined;
                     pageX = undefined;

@@ -11,11 +11,15 @@ namespace BDataGrid.Library
         where TItem : class
     {
         private Queue<Action<DataGridRowInfo<TItem>>> GlobalActions { get; } = new Queue<Action<DataGridRowInfo<TItem>>>();
-        internal List<DataGridRowInfo<TItem>?> RowInfos { get; } = new List<DataGridRowInfo<TItem>?>();
 
-        internal DataGridRowInfo<TItem> GlobalRowInfo { get; set; }
+        internal List<DataGridRowInfo<TItem>?> RowInfos_ = new List<DataGridRowInfo<TItem>?>();
+        public IReadOnlyList<DataGridRowInfo<TItem>?> RowInfos => RowInfos_;
 
-        internal Dictionary<string, DataGridColInfo<TItem>> Columns = new Dictionary<string, DataGridColInfo<TItem>>();
+        public DataGridRowInfo<TItem> GlobalRowInfo { get; internal set; }
+
+        internal Dictionary<string, DataGridColInfo<TItem>> Columns_ = new Dictionary<string, DataGridColInfo<TItem>>();
+
+        public IReadOnlyDictionary<string, DataGridColInfo<TItem>> Columns => Columns_;
 
         public DataGridBuilder() : base(null, null)
         {
@@ -40,10 +44,10 @@ namespace BDataGrid.Library
 
         public void Rebuild(bool clearColumns = false)
         {
-            RowInfos.Clear();
-            RowInfos.Capacity = Items.Count;
+            RowInfos_.Clear();
+            RowInfos_.Capacity = Items.Count;
             if (clearColumns)
-                Columns.Clear();
+                Columns_.Clear();
             ShowHeaderFilters = false;
 
             GlobalRowInfo = new DataGridRowInfo<TItem>();
@@ -60,7 +64,7 @@ namespace BDataGrid.Library
                 var item = Items[i];
                 if (ExecuteActions(cacheRowInfo, item))
                 {
-                    RowInfos.Add(cacheRowInfo);
+                    RowInfos_.Add(cacheRowInfo);
 
                     var location = cacheRowInfo.RowLocation ?? RowLocation.Body;
                     if (location == RowLocation.Body)
@@ -74,7 +78,7 @@ namespace BDataGrid.Library
                 }
                 else
                 {
-                    RowInfos.Add(null);
+                    RowInfos_.Add(null);
 
                     allBodyItems.Add((i, item));
                 }
@@ -138,7 +142,7 @@ namespace BDataGrid.Library
             return false;
         }
 
-        private FilterResult DefaultFilterMethod(DataGridColInfo<TItem> colInfo, DataGridRowInfo<TItem> rowInfo, TItem item)
+        public FilterResult DefaultFilterMethod(DataGridColInfo<TItem> colInfo, DataGridRowInfo<TItem> rowInfo, TItem item)
         {
             var strFilter = colInfo.CurrentFilterValue?.ToString() ?? "";
             if (string.IsNullOrEmpty(strFilter))

@@ -32,7 +32,7 @@
                 @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
                 @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
 
-                <div style="display: block; max-height: 80px; overflow: auto">
+                <div style="display: block; max-height: 50px; overflow: auto">
                     @if (isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null)
                     {
                         @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);

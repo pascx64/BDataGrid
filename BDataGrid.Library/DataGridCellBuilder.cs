@@ -12,15 +12,15 @@ namespace BDataGrid.Library
     {
         protected Expression<Func<TItem, TProperty>> Selector { get; set; }
 
-        protected string PropertyName { get; private set; }
+        public string PropertyName { get; private set; }
 
         public DataGridRowBuilder<TItem> DataGridRowBuilder { get; }
 
-        protected readonly Func<TItem, TProperty> SelectorFunc;
+        public readonly Func<TItem, TProperty> SelectorFunc;
 
-        protected readonly Action<TItem, object?> SetFunc;
+        public readonly Action<TItem, object?> SetFunc;
 
-        private readonly Func<object?, TProperty> ConvertToProperty;
+        public readonly Func<object?, TProperty> ConvertToProperty;
 
 
         public DataGridCellBuilder(Expression<Func<TItem, TProperty>> selector, DataGridRowBuilder<TItem> dataGridRowBuilder)

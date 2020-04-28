@@ -36,7 +36,7 @@ namespace BDataGrid.Library
         [Parameter]
         public EventCallback<DataGridSelectedCellInfo<TItem>?> SelectedCellChanged { get; set; }
 
-        Microsoft.JSInterop.DotNetObjectReference<BDataGrid<TItem>>? ThisReference { get; set; }
+        DotNetObjectReference<BDataGrid<TItem>>? ThisReference { get; set; }
 
         private bool SelectedCellChangedSinceLastRefresh { get; set; }
         private DataGridSelectedCellInfo<TItem>? SelectedCell_;
@@ -65,6 +65,9 @@ namespace BDataGrid.Library
 
         [Parameter]
         public string Height { get; set; } = "100%";
+
+        [Parameter]
+        public string HeaderPadding { get; set; } = "2000px";
 
         public int CurrentTotalPages => (int)Math.Ceiling(Builder.FilteredItems.Count / (float)PageSize);
 
