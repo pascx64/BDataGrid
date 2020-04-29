@@ -39,7 +39,13 @@
                     }
                     else if (cellInfo?.Formatter != null)
                     {
-                        @cellInfo.Formatter(Item)
+                        @cellInfo.Formatter(new DataGridFormatterArgs()
+                        {
+                            Value = col.Value.ValueSelector(Item),
+                            Item = Item,
+                            IsReadOnly = cellInfo?.IsReadOnly ?? RowInfo.IsReadOnly ?? true,
+                            AcceptNewValue = new EventCallback<object?>(DataGrid, (Func<object?, Task<bool>>)(v => DataGrid.TryAcceptChangesFromFormatter(Item, v, col.Value, RowInfo, cellInfo)))
+                        })
                     }
                     else
                     {

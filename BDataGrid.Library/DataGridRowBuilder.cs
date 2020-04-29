@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
@@ -132,6 +133,11 @@ namespace BDataGrid.Library
             return this;
         }
 
+        public DataGridRowBuilder<TItem> HasCellValueChangedCallback(Func<DataGridSelectedCellInfo<TItem>, Task>? onCellValueChanged)
+        {
+            AddAction(rowInfo => rowInfo.OnCellValueChanged = onCellValueChanged);
 
+            return this;
+        }
     }
 }

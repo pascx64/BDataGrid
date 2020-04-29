@@ -92,7 +92,10 @@ namespace BDataGrid.Library
 
             if (Builder == null)
             {
-                Builder = new DataGridBuilder<TItem>();
+                Builder = new DataGridBuilder<TItem>()
+                {
+                    BDataGrid = this
+                };
                 Configure(Builder);
                 Builder.Build(Items);
             }
@@ -105,6 +108,19 @@ namespace BDataGrid.Library
                 Builder.Build(Items);
             }
         }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+                await JSRuntime.InvokeAsync<bool>("BDataGrid.initializeDatagrid", new object?[] { ThisReference = DotNetObjectReference.Create(this), TableRef });
+
+            if (SelectedCell != null && TableRef != null && SelectedCellChangedSinceLastRefresh)
+                _ = TableRef.Value.FocusAsync(JSRuntime, ".selectedCell");
+        }
+
+        #region Sorting + selected cell
 
         public void SortingDirectionChangedFromClient(DataGridColInfo<TItem> col)
         {
@@ -150,16 +166,7 @@ namespace BDataGrid.Library
             }
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-                await JSRuntime.InvokeAsync<bool>("BDataGrid.initializeDatagrid", new object?[] { ThisReference = DotNetObjectReference.Create(this), TableRef });
-
-            if (SelectedCell != null && TableRef != null && SelectedCellChangedSinceLastRefresh)
-                _ = TableRef.Value.FocusAsync(JSRuntime, ".selectedCell");
-        }
+        #endregion
 
         private DataGridCellInfo<TItem>? GetCellInfo(int itemIndex, string col)
         {
@@ -197,30 +204,27 @@ namespace BDataGrid.Library
         internal DataGridEditorArgs? CurrentEditor { get; private set; }
         internal RenderFragment<DataGridEditorArgs>? CurrentEditorRenderFragment { get; private set; }
 
-        private async Task<bool> TryAcceptChanged(object? value)
+        private async Task<bool> TryAcceptChanges(object? value)
         {
             if (SelectedCell == null)
                 return false;
 
-            var validator = SelectedCell.CellInfo?.Validator;
-            if (validator != null)
-            {
-                var result = validator(SelectedCell.Item, value);
+            var result = await Builder.TryAcceptChanges(SelectedCell.Item, value, SelectedCell.Col, SelectedCell.RowInfo, SelectedCell.CellInfo);
 
-                if (!result.IsValid)
-                {
-                    // show error here
+            if( !result.ChangesApplied)
+                _ = JSRuntime.InvokeVoidAsync("BDataGrid.editorError", ".selectedCell", result.ErrorMessage ?? "Error while applying value");
 
-                    return false;
-                }
-            }
+            return result.ChangesApplied;
+        }
 
-            if (SelectedCell.Col.ValueSet == null)
-                throw new Exception("Unable to apply new value, no 'ValueSet' is available");
+        public async Task<bool> TryAcceptChangesFromFormatter( TItem item, object? newValue, DataGridColInfo<TItem> col, DataGridRowInfo<TItem> rowInfo, DataGridCellInfo<TItem>? cellInfo)
+        {
+            var result = await Builder.TryAcceptChanges(item, newValue, col, rowInfo, cellInfo);
 
-            SelectedCell.Col.ValueSet(SelectedCell.Item, value);
+            if (!result.ChangesApplied)
+                _ = JSRuntime.InvokeVoidAsync("BDataGrid.editorError", ".selectedCell", result.ErrorMessage ?? "Error while applying value");
 
-            return true;
+            return result.ChangesApplied;
         }
 
         public void CloseEditor()
@@ -242,11 +246,11 @@ namespace BDataGrid.Library
                 }
             }
 
-
-            if (Builder.RowInfos[Items.IndexOf(item)]?.IsReadOnly ?? Builder.GlobalRowInfo.IsReadOnly ?? false)
+            var itemIndex = Items.IndexOf(item);
+            if (Builder.RowInfos[itemIndex]?.IsReadOnly ?? Builder.GlobalRowInfo.IsReadOnly ?? false)
                 return;
 
-            var cellInfo = GetCellInfo(item, col);
+            var cellInfo = GetCellInfo(itemIndex, col.Id);
             if (cellInfo?.EditorInfo?.RenderFragmentProvider == null)
                 return;
 
@@ -254,7 +258,7 @@ namespace BDataGrid.Library
             {
                 FirstCharacter = firstCharacter,
                 Value = firstCharacter == null ? Builder.Columns[col.Id].ValueSelector(item) : null,
-                TryAcceptChanges = TryAcceptChanged,
+                TryAcceptChanges = TryAcceptChanges,
                 CancelAndCloseEditor = new EventCallback(this, (Action)CloseEditor)
             };
             CurrentEditorRenderFragment = cellInfo.EditorInfo.RenderFragmentProvider(item);

@@ -53,49 +53,7 @@ namespace BDataGrid.Library
                 throw new Exception("Unable to determine member access :" + selector.ToString());
 
 
-            ConvertToProperty = obj =>
-            {
-                var type = typeof(TProperty);
-                var realType = type;
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    realType = Nullable.GetUnderlyingType(type);
-
-                if (obj == null)
-                {
-                    if (type == realType)
-                    {
-                        if (!type.IsClass)
-                            throw new Exception("null cannot be converted to type:" + type);
-#pragma warning disable CS8603 // Possible null reference return.
-                        return default;
-#pragma warning restore CS8603 // Possible null reference return.
-                    }
-                    else
-                        return (TProperty)Activator.CreateInstance(type);
-                }
-
-                object returnValue;
-                if (realType == obj.GetType())
-                    returnValue = obj;
-                else if (realType == typeof(string))
-                    returnValue = obj.ToString();
-                else if (realType == typeof(float) || realType == typeof(double) || realType == typeof(int) || realType == typeof(uint) || realType == typeof(decimal)
-                    || realType == typeof(short) || realType == typeof(byte))
-                    returnValue = Convert.ChangeType(obj, realType);
-                else if (realType == typeof(bool))
-                {
-                    if (obj is bool b)
-                        returnValue = b;
-                    else
-                        throw new Exception("Cannot convert to bool from type:" + type);
-                }
-                else
-                    throw new Exception("Cannot convert object to type:" + type);
-
-                if (realType != type)
-                    returnValue = Activator.CreateInstance(type, returnValue);
-                return (TProperty)returnValue;
-            };
+            ConvertToProperty = ConvertToPropertyValue;
         }
         private readonly Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>> Actions = new Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>>();
 
@@ -114,7 +72,7 @@ namespace BDataGrid.Library
             {
                 cellInfo = rowInfo.Cells[PropertyName] = new DataGridCellInfo<TItem>();
                 if (typeof(TProperty) == typeof(bool) || typeof(TProperty) == typeof(bool?))
-                    cellInfo.Formatter = GetFormatter(typeof(Formatters.DataGridFormatter_CheckBox), SelectorFunc);
+                    cellInfo.Formatter = GetFormatter(typeof(Formatters.DataGridFormatter_CheckBox));
             }
 
             foreach (var action in Actions)
@@ -173,37 +131,83 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasColSpan(int colspan)
         {
-            return AddAction((row, cell) => cell.ColSpan = colspan);
+            return AddAction((_, cell) => cell.ColSpan = colspan);
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasClass(string classes, bool overrideExisting = true)
         {
-            return AddAction((row, cell) => cell.Classes = overrideExisting ? classes : ((cell.Classes ?? "") + " " + classes).Trim());
+            return AddAction((_, cell) => cell.Classes = overrideExisting ? classes : ((cell.Classes ?? "") + " " + classes).Trim());
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
         {
-            return AddAction((row, cell) => cell.BackgroundColor = color);
+            return AddAction((_, cell) => cell.BackgroundColor = color);
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(string htmlColor)
         {
-            return AddAction((row, cell) => cell.BackgroundColor = System.Drawing.ColorTranslator.FromHtml(htmlColor));
+            return AddAction((_, cell) => cell.BackgroundColor = System.Drawing.ColorTranslator.FromHtml(htmlColor));
         }
 
         public DataGridCellBuilder<TItem, TProperty> IsReadOnly()
         {
-            return AddAction((row, cell) => cell.IsReadOnly = true);
+            return AddAction((_, cell) => cell.IsReadOnly = true);
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> IsNotReadOnly()
+        {
+            return AddAction((_, cell) => cell.IsReadOnly = false);
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> IsEditable()
+        {
+            return AddAction((_, cell) => cell.IsReadOnly = false);
         }
 
         public DataGridCellBuilder<TItem, TProperty> ReplaceWith(string content = "")
         {
-            return AddAction((row, cell) => cell.FormatterString = _ => content);
+            return AddAction((_, cell) => cell.FormatterString = _ => content);
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasFormatter(Func<TItem, string> formatter)
         {
-            return AddAction((row, cell) => cell.FormatterString = formatter);
+            return AddAction((_, cell) => cell.FormatterString = formatter);
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasAutoEditor()
+        {
+            var type = typeof(TProperty);
+            var realType = type;
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                realType = Nullable.GetUnderlyingType(type);
+
+
+            if (realType == typeof(string))
+                return HasEditor<Editors.BDataGridEditor_Text>();
+            if (realType == typeof(float) || realType == typeof(double) || realType == typeof(int) || realType == typeof(uint) || realType == typeof(decimal)
+                || realType == typeof(short) || realType == typeof(byte) || realType == typeof(long) || realType == typeof(ulong)
+                || realType == typeof(bool))
+            {
+                HasEditorValueConversion(str =>
+                {
+                    try
+                    {
+                        var value = ConvertToPropertyValue(str);
+                        return new EditorValueConversionResult(value);
+                    }
+                    catch (Exception)
+                    {
+                        return new EditorValueConversionResult("Erreur de conversion");
+                    }
+                });
+                if (realType != typeof(bool))
+                    return HasEditor<Editors.BDataGridEditor_Text>();
+
+                return this;
+            }
+
+
+            throw new Exception("Unknowned type for automatic editor: " + type);
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasEditor(Func<TItem, RenderFragment<DataGridEditorArgs>> renderFragmentProvider)
@@ -267,7 +271,7 @@ namespace BDataGrid.Library
             return AddAction((row, cell) => cell.Append = append);
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasFormatter(Func<TItem, RenderFragment> renderFragmentProvider)
+        public DataGridCellBuilder<TItem, TProperty> HasFormatter(RenderFragment<DataGridFormatterArgs> renderFragmentProvider)
         {
             return AddAction((row, cell) =>
             {
@@ -275,19 +279,23 @@ namespace BDataGrid.Library
             });
         }
 
-        private static Func<TItem, RenderFragment> GetFormatter(Type editorType, Func<TItem, TProperty> selector, Func<TItem, object>? argsProvider = null)
+        private RenderFragment<DataGridFormatterArgs> GetFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
         {
-            return item =>
+            Func<TItem, object?, DataGridColInfo<TItem>, DataGridRowInfo<TItem>, DataGridCellInfo<TItem>, Task<DataGridAcceptChangesResult>> callback = (item, value, col, row, cell) =>
+            {
+                return DataGridRowBuilder.DataGridBuilder.TryAcceptChanges(item, value, col, row, cell);
+            };
+
+            return args =>
             {
                 return builder =>
                 {
                     builder.OpenComponent(0, editorType);
-                    builder.AddAttribute(1, "Value", selector(item));
-                    builder.AddAttribute(2, "Item", item);
+                    builder.AddAttribute(1, "Args", args);
                     if (argsProvider != null)
                     {
-                        var editorArgs = argsProvider(item);
-                        int sequence = 2;
+                        var editorArgs = argsProvider((TItem)args.Item);
+                        int sequence = 4;
                         foreach (var property in editorArgs.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
                             builder.AddAttribute(++sequence, property.Name, property.GetValue(editorArgs));
                     }
@@ -298,7 +306,7 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
         {
-            return HasFormatter(GetFormatter(editorType, SelectorFunc, argsProvider));
+            return AddAction((row, cell) => GetFormatter(editorType, argsProvider));
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasFormatter<TFormatter>(Func<TItem, object>? argsProvider = null)
@@ -331,12 +339,12 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasValidator(Func<TItem, TProperty, ValidationResult> validator)
         {
-            return AddAction((row, cell) =>
+            return AddAction((_, cell) =>
             {
                 var previousValidator = cell.Validator;
                 cell.Validator = (item, obj) =>
                 {
-                    if( previousValidator != null )
+                    if (previousValidator != null)
                     {
                         var previousResult = previousValidator(item, obj);
                         if (!previousResult.IsValid)
@@ -350,20 +358,81 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasValidator(Func<TProperty, ValidationResult> validator)
         {
-            return HasValidator((_, property) => validator(property));
+            return HasValidator((_, cell) => validator(cell));
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasNewValidator(Func<TItem, TProperty, ValidationResult>? validator)
         {
-            return AddAction((row, cell) =>
+            return AddAction((_, cell) =>
             {
                 cell.Validator = validator == null ? null : (Func<TItem, object?, ValidationResult>?)((item, obj) => validator(item, ConvertToProperty(obj)));
             });
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasNewValidator(Func< TProperty, ValidationResult>? validator)
+        public DataGridCellBuilder<TItem, TProperty> HasNewValidator(Func<TProperty, ValidationResult>? validator)
         {
-            return HasValidator((_, property) => validator?.Invoke(property) ?? new ValidationResult(true));
+            return HasValidator((_, cell) => validator?.Invoke(cell) ?? new ValidationResult(true));
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasCellValueChangedCallback(Func<DataGridSelectedCellInfo<TItem>, Task>? onCellValueChanged)
+        {
+            AddAction((_, cell) => cell.OnCellValueChanged = onCellValueChanged);
+
+            return this;
+        }
+
+        public DataGridCellBuilder<TItem, TProperty> HasEditorValueConversion(Func<object?, EditorValueConversionResult>? editorValueConversion)
+        {
+            AddAction((_, cell) => cell.EditorValueConversion = editorValueConversion);
+
+            return this;
+        }
+
+        private static TProperty ConvertToPropertyValue(object? obj)
+        {
+            var type = typeof(TProperty);
+            var realType = type;
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                realType = Nullable.GetUnderlyingType(type);
+
+            if (obj == null)
+            {
+                if (type == realType)
+                {
+                    if (!type.IsClass)
+                        throw new Exception("null cannot be converted to type:" + type);
+#pragma warning disable CS8603 // Possible null reference return.
+                    return default;
+#pragma warning restore CS8603 // Possible null reference return.
+                }
+                else
+                    return (TProperty)Activator.CreateInstance(type);
+            }
+
+            object returnValue;
+            if (realType == obj.GetType())
+                returnValue = obj;
+            else if (realType == typeof(string))
+                returnValue = obj.ToString();
+            else if (realType == typeof(float) || realType == typeof(double) || realType == typeof(int) || realType == typeof(uint) || realType == typeof(decimal)
+                || realType == typeof(short) || realType == typeof(byte))
+                returnValue = Convert.ChangeType(obj, realType);
+            else if (realType == typeof(bool))
+            {
+                if (obj is bool b)
+                    returnValue = b;
+                else if (obj is string str)
+                    returnValue = Convert.ChangeType(obj, realType);
+                else
+                    throw new Exception("Cannot convert to bool from type:" + type);
+            }
+            else
+                throw new Exception("Cannot convert object to type:" + type);
+
+            if (realType != type)
+                returnValue = Activator.CreateInstance(type, returnValue);
+
+            return (TProperty)returnValue;
         }
     }
 }

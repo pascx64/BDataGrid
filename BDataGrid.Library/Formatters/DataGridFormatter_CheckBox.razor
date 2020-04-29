@@ -1,9 +1,15 @@
 ﻿@inherits DataGridFormatter
 
 <div>
-    <input type="checkbox" checked="@(Value is bool b && b == true)" readonly disabled/>
+    <input type="checkbox" checked="@(Args.Value is bool b && b == true)" readonly="@Args.IsReadOnly" disabled="@Args.IsReadOnly" @onchange="ev => OnValueChangedFromClient(ev.Value)"/>
 </div>
 
 @code {
 
+    private Task OnValueChangedFromClient(object value)
+    {
+        Args.Value = value;
+
+        return Args.AcceptNewValue.InvokeAsync(value);
+    }
 }

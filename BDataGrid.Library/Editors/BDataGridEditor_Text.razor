@@ -22,13 +22,13 @@
         if (firstRender)
         {
             // this is done in the After Render so that we only do it in the firstRender
-            if (Args.Value != null && !(Args.Value is string str))
-                throw new Exception("Text editor can only be used with string");
 
             if (Args.FirstCharacter != null)
                 Text = Args.FirstCharacter;
+            else if (Args.Value is string str)
+                Text = str;
             else
-                Text = (string?)Args.Value ?? "";
+                Text = Args.Value?.ToString() ?? "";
 
             Args.ForceAccept = () => Args.TryAcceptChanges(Text);
 

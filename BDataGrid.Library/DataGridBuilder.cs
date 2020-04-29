@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
@@ -20,6 +21,8 @@ namespace BDataGrid.Library
         internal Dictionary<string, DataGridColInfo<TItem>> Columns_ = new Dictionary<string, DataGridColInfo<TItem>>();
 
         public IReadOnlyDictionary<string, DataGridColInfo<TItem>> Columns => Columns_;
+
+        internal BDataGrid<TItem> BDataGrid { get; set; }
 
         public DataGridBuilder() : base(null, null)
         {
@@ -158,6 +161,46 @@ namespace BDataGrid.Library
             return str.Contains(strFilter, StringComparison.OrdinalIgnoreCase) ? FilterResult.Keep : FilterResult.Remove;
         }
 
+
+        public async Task<DataGridAcceptChangesResult> TryAcceptChanges(TItem item, object? value, DataGridColInfo<TItem> col, DataGridRowInfo<TItem> rowInfo, DataGridCellInfo<TItem>? cellInfo)
+        {
+            object? valueConverted;
+            if (cellInfo?.EditorValueConversion != null)
+            {
+                var result = cellInfo.EditorValueConversion(value);
+                if (!result.ConversionWorked)
+                    return new DataGridAcceptChangesResult(result.ErrorMessage ?? "Can't convert value");
+                else
+                    valueConverted = result.Value;
+            }
+            else
+                valueConverted = value;
+
+            var validator = cellInfo?.Validator;
+            if (validator != null)
+            {
+                var result = validator(item, valueConverted);
+
+                if (!result.IsValid)
+                    new DataGridAcceptChangesResult(result.ErrorMessage ?? "Validation failed");
+            }
+            if (col.ValueSet == null)
+                throw new Exception("Unable to apply new value, no 'ValueSet' is available");
+
+
+            col.ValueSet(item, valueConverted);
+
+            var selectedCell = new DataGridSelectedCellInfo<TItem>(item, col, rowInfo);
+
+            if (cellInfo?.OnCellValueChanged != null)
+                await cellInfo.OnCellValueChanged(selectedCell);
+
+            if (rowInfo.OnCellValueChanged != null)
+                await rowInfo.OnCellValueChanged(selectedCell);
+
+            return new DataGridAcceptChangesResult(true);
+        }
+
         public override void AddAction(Action<DataGridRowInfo<TItem>> action)
         {
             GlobalActions.Enqueue(action);
@@ -225,6 +268,12 @@ namespace BDataGrid.Library
                     {
                         var hasWidth = colProperty.GetType().GetMethod(nameof(DataGridColBuilder<object, int>.HasHeaderText));
                         hasWidth.Invoke(colProperty, new object[] { attribute.Name });
+                    }
+
+                    if (attribute.AllowEdit)
+                    {
+                        var hasEditor = colProperty.GetType().GetMethod(nameof(DataGridColBuilder<object, int>.HasAutoEditor));
+                        hasEditor.Invoke(colProperty, new object[0]);
                     }
                 }
             }

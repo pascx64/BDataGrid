@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
@@ -20,6 +21,28 @@ namespace BDataGrid.Library
         public string? ErrorMessage { get; set; }
     }
 
+    public struct EditorValueConversionResult
+    {
+        public EditorValueConversionResult(object? value)
+        {
+            ConversionWorked = true;
+            ErrorMessage = null;
+            Value = value;
+        }
+
+        public EditorValueConversionResult(string errorMessage)
+        {
+            ConversionWorked = false;
+            ErrorMessage = errorMessage;
+            Value = null;
+        }
+        public bool ConversionWorked { get; set; }
+        
+        public object? Value { get; set; }
+
+        public string? ErrorMessage { get; set; }
+    }
+
     public class DataGridCellInfo<TItem>
         where TItem : class
     {
@@ -35,11 +58,15 @@ namespace BDataGrid.Library
 
         public string? Append { get; set; }
 
-        public Func<TItem, RenderFragment>? Formatter { get; set; }
+        public RenderFragment<DataGridFormatterArgs>? Formatter { get; set; }
 
         public DataGridEditorInfo<TItem>? EditorInfo { get; set; }
 
+        public Func<object?, EditorValueConversionResult>? EditorValueConversion { get; set; }
+
         public Func<TItem, object?, ValidationResult>? Validator { get; set; }
+
+        public Func<DataGridSelectedCellInfo<TItem>, Task>? OnCellValueChanged { get; internal set; }
 
         public DataGridCellInfo<TItem> Clone()
         {

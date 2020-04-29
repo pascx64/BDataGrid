@@ -9,5 +9,7 @@ namespace BDataGrid.Library
         public string? Name { get; set; }
 
         public string? Width { get; set; }
+
+        public bool AllowEdit { get; set; }
     }
 }

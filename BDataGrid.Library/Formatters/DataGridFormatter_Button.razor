@@ -1,7 +1,7 @@
 ﻿@inherits DataGridFormatter
 
 <div>
-    <button @onclick="() => Callback(Item)">@(Value?.ToString() ?? "")</button>
+    <button @onclick="() => Callback(Args.Item)">@(Args.Value?.ToString() ?? "")</button>
 </div>
 
 @code {

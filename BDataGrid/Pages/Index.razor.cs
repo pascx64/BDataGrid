@@ -18,6 +18,7 @@ namespace BDataGrid.Example.Pages
 
             public string Description { get; set; }
 
+            [DataGridColumnInfo(AllowEdit = true)]
             public float Value { get; set; }
 
             public string? ActionHere { get; set; }
@@ -37,10 +38,9 @@ namespace BDataGrid.Example.Pages
                 .Property(p => p.Checkbox)
                     .HasHeaderText("")
                     .HasWidth("50px")
+                    .HasAutoEditor()
                 .Property(p => p.ActionHere)
-                    .HasWidth("150px");
-
-            builder
+                    .HasWidth("150px")
                 .Property(p => p.Name)
                     .HasHeaderText("Name")
                     .HasWidth("250px")
@@ -50,7 +50,9 @@ namespace BDataGrid.Example.Pages
                 .Property(p => p.Value)
                     .HasHeaderText("Value")
                     .HasWidth("100px")
-                    .HasAppendedText("$");
+                    .HasAppendedText("$")
+                    .HasAutoEditor();
+
 
             builder.HasFilterRow();
 
@@ -74,6 +76,8 @@ namespace BDataGrid.Example.Pages
                             .EndIf()
                         .Property(p => p.Description)
                             .HasClass("warning")
+                        .Property( p => p.Checkbox )
+                            .IsNotReadOnly()
                     .ElseRow()
                         .Property(p => p.Description)
                             .HasClass("positive");

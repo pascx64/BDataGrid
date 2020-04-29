@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
@@ -23,7 +24,7 @@ namespace BDataGrid.Library
 
         public bool? ForceRefresh { get; internal set; }
 
-        public Func<TItem, DataGridColInfo<TItem>>? OnCellValueChanged { get; internal set; }
+        public Func<DataGridSelectedCellInfo<TItem>, Task>? OnCellValueChanged { get; internal set; }
 
         public Dictionary<string, DataGridCellInfo<TItem>>? Cells { get; internal set; }
 

@@ -58,7 +58,7 @@ var BDataGrid;
             });
             document.addEventListener('mouseup', function (e) {
                 if (curCol && currentDotNet && currentColIndex >= 0) {
-                    datagridDotnet.invokeMethodAsync('OnColResizedFromClient', currentColIndex, $(curCol).outerWidth() + "px");
+                    currentDotNet.invokeMethodAsync('OnColResizedFromClient', currentColIndex, $(curCol).outerWidth() + "px");
                     curCol = undefined;
                     pageX = undefined;
                     curColWidth = undefined;
@@ -78,13 +78,13 @@ var BDataGrid;
         if (!cols)
             return;
         for (var i = 0; i < cols.length; i++) {
-            var div = createDiv(table.offsetHeight);
+            var div = createDiv();
             cols[i].appendChild(div);
             cols[i].style.position = 'relative';
             setListeners(i, div, dotnet);
         }
     }
-    function createDiv(height) {
+    function createDiv() {
         var div = document.createElement('div');
         div.style.top = 0;
         div.style.right = 0;
@@ -130,5 +130,26 @@ var BDataGrid;
         }
     }
     BDataGrid.saveAsFile = saveAsFile;
+    function editorError(elementSelector, errorMessage) {
+        if ($(elementSelector).hasClass('BDataGridError'))
+            return;
+        $(elementSelector).addClass('BDataGridError');
+        setTimeout(function () {
+            $(elementSelector).removeClass('BDataGridError');
+        }, 1000);
+        new Noty({
+            layout: 'topCenter',
+            theme: 'mint',
+            timeout: 3000,
+            progressBar: true,
+            text: errorMessage,
+            type: 'error',
+            animation: {
+                open: 'noty_effects_open',
+                close: 'noty_effects_close'
+            },
+        }).show();
+    }
+    BDataGrid.editorError = editorError;
 })(BDataGrid || (BDataGrid = {}));
 //# sourceMappingURL=BDataGrid.js.map

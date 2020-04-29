@@ -1,1 +1,18 @@
 ﻿
+@keyframes BDataGridBlinkError {
+    50% {
+        outline-color: #ff0000;
+    }
+}
+
+.selectedCell {
+    outline: 2px solid black;
+}
+
+    .selectedCell.BDataGridError {
+        animation-name: BDataGridBlinkError;
+        animation-duration: .1s;
+        animation-timing-function: step-end;
+        animation-iteration-count: 6;
+        animation-direction: alternate;
+    }

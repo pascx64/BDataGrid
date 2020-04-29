@@ -118,5 +118,11 @@ namespace BDataGrid.Library
         {
             return HasFilterFormatter(typeof(TFilter), editorArgs);
         }
+
+        public new DataGridColBuilder<TItem, TProperty> HasAutoEditor()
+        {
+            base.HasAutoEditor();
+            return this;
+        }
     }
 }
