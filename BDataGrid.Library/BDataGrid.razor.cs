@@ -251,6 +251,10 @@ namespace BDataGrid.Library
                 return;
 
             var cellInfo = GetCellInfo(itemIndex, col.Id);
+
+            if (cellInfo?.IsReadOnly == true)
+                return;
+
             if (cellInfo?.EditorInfo?.RenderFragmentProvider == null)
                 return;
 
