@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
-    internal static class Utility
+    public static class Utility
     {
         public static async Task FocusAsync(this ElementReference elementRef, IJSRuntime jsRuntime, string? additionalSelector = null)
         {

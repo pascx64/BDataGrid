@@ -20,6 +20,9 @@ namespace BDataGrid {
         var footerTable = $(element).find('table')[2] as HTMLBaseElement;
         var scrollBar = $(element).find('.scrollBarDiv')[0] as HTMLBaseElement;
         bodyTable.onkeydown = ev => {
+            if ($(element).data('BDataGrid_EditionMode'))
+                return;
+
             if (ev.keyCode == 9 || // tab
                 (ev.keyCode >= 37 && ev.keyCode <= 40)) { // arrows keys
                 ev.preventDefault();
@@ -91,6 +94,10 @@ namespace BDataGrid {
 
 
         return true;
+    }
+
+    export function switchEditionMode(element: HTMLBaseElement, mode: boolean) {
+        $(element).data('BDataGrid_EditionMode', mode);
     }
 
     function resizableGrid(table: HTMLTableElement, dotnet: any) {

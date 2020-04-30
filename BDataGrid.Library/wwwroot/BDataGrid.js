@@ -15,6 +15,8 @@ var BDataGrid;
         var footerTable = $(element).find('table')[2];
         var scrollBar = $(element).find('.scrollBarDiv')[0];
         bodyTable.onkeydown = function (ev) {
+            if ($(element).data('BDataGrid_EditionMode'))
+                return;
             if (ev.keyCode == 9 || // tab
                 (ev.keyCode >= 37 && ev.keyCode <= 40)) { // arrows keys
                 ev.preventDefault();
@@ -72,6 +74,10 @@ var BDataGrid;
         return true;
     }
     BDataGrid.initializeDatagrid = initializeDatagrid;
+    function switchEditionMode(element, mode) {
+        $(element).data('BDataGrid_EditionMode', mode);
+    }
+    BDataGrid.switchEditionMode = switchEditionMode;
     function resizableGrid(table, dotnet) {
         var row = table.getElementsByTagName('tr')[0];
         var cols = row ? row.children : undefined;

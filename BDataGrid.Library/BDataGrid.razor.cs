@@ -102,8 +102,7 @@ namespace BDataGrid.Library
             else if (ItemsChanged)
             {
                 ItemsChanged = false;
-                CurrentEditor = null;
-                CurrentEditorRenderFragment = null;
+                CloseEditor();
 
                 Builder.Build(Items);
             }
@@ -156,8 +155,7 @@ namespace BDataGrid.Library
                 else
                     SelectedCell = null;
 
-                CurrentEditor = null;
-                CurrentEditorRenderFragment = null;
+                CloseEditor();
 
                 await SelectedCellChanged.InvokeAsync(SelectedCell);
 
@@ -211,13 +209,13 @@ namespace BDataGrid.Library
 
             var result = await Builder.TryAcceptChanges(SelectedCell.Item, value, SelectedCell.Col, SelectedCell.RowInfo, SelectedCell.CellInfo);
 
-            if( !result.ChangesApplied)
+            if (!result.ChangesApplied)
                 _ = JSRuntime.InvokeVoidAsync("BDataGrid.editorError", ".selectedCell", result.ErrorMessage ?? "Error while applying value");
 
             return result.ChangesApplied;
         }
 
-        public async Task<bool> TryAcceptChangesFromFormatter( TItem item, object? newValue, DataGridColInfo<TItem> col, DataGridRowInfo<TItem> rowInfo, DataGridCellInfo<TItem>? cellInfo)
+        public async Task<bool> TryAcceptChangesFromFormatter(TItem item, object? newValue, DataGridColInfo<TItem> col, DataGridRowInfo<TItem> rowInfo, DataGridCellInfo<TItem>? cellInfo)
         {
             var result = await Builder.TryAcceptChanges(item, newValue, col, rowInfo, cellInfo);
 
@@ -231,6 +229,8 @@ namespace BDataGrid.Library
         {
             CurrentEditor = null;
             CurrentEditorRenderFragment = null;
+
+            _ = JSRuntime.InvokeVoidAsync("BDataGrid.switchEditionMode", TableRef, false);
         }
 
         public async Task OpenEditor(TItem item, DataGridColInfo<TItem> col, string? firstCharacter = null)
@@ -263,6 +263,7 @@ namespace BDataGrid.Library
             };
             CurrentEditorRenderFragment = cellInfo.EditorInfo.RenderFragmentProvider(item);
 
+            _ = JSRuntime.InvokeVoidAsync("BDataGrid.switchEditionMode", TableRef, true);
             StateHasChanged();
         }
 
