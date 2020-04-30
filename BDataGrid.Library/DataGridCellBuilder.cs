@@ -306,7 +306,7 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
         {
-            return AddAction((row, cell) => GetFormatter(editorType, argsProvider));
+            return AddAction((row, cell) => cell.Formatter = GetFormatter(editorType, argsProvider));
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasFormatter<TFormatter>(Func<TItem, object>? argsProvider = null)

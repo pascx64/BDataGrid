@@ -124,5 +124,23 @@ namespace BDataGrid.Library
             base.HasAutoEditor();
             return this;
         }
+        public new DataGridColBuilder<TItem, TProperty> IsReadOnly()
+        {
+            AddAction((_, cell) => cell.IsReadOnly = true);
+            return this;
+        }
+
+        public new DataGridColBuilder<TItem, TProperty> IsNotReadOnly()
+        {
+            AddAction((_, cell) => cell.IsReadOnly = false);
+            return this;
+        }
+
+        public new DataGridColBuilder<TItem, TProperty> IsEditable()
+        {
+            AddAction((_, cell) => cell.IsReadOnly = false);
+            return this;
+        }
+
     }
 }
