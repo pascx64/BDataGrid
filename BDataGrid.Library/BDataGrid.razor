@@ -16,7 +16,7 @@
                                  SortDirection.Ascending => BDataGridStyle.HeaderSortedAscendingClass,
                                  SortDirection.Descending => BDataGridStyle.HeaderSortedDescendingClass,
                                  _ => ""
-                             })" style="width: @width; min-width: @width; max-width: @width; overflow: hidden; position: relative;">
+                             }) @(col.Value.IsFixed ? "fixedCol" : "")" style="width: @width; min-width: @width; max-width: @width; overflow: hidden; position: relative;">
                                 @(col.Value.HeaderText ?? "Unknowned header")
                             </th>
                         }
@@ -28,7 +28,7 @@
                             @foreach (var col in Builder.Columns)
                             {
                                 var width = col.Value.Width == null ? (100 / Builder.Columns.Count) + "%" : col.Value.Width;
-                                <th>
+                                <th class="@(col.Value.IsFixed ? "fixedCol" : "")">
                                     @col.Value.FilterRenderFragment(this)
                                 </th>
                             }

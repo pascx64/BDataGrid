@@ -47,6 +47,8 @@ var BDataGrid;
         footerTable.parentElement.onscroll = function (sc) {
             headerTable.parentElement.scrollLeft = this.scrollLeft;
             bodyTable.parentElement.scrollLeft = this.scrollLeft;
+            var pos = this.scrollLeft == 0 ? 0 : this.scrollLeft - 1; // used to hide imperfection on the left side of the col
+            $(element).find('.fixedCol').css('left', pos + 'px');
         };
         if (!alreadyBinded) {
             alreadyBinded = true;

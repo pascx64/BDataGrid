@@ -36,9 +36,11 @@ namespace BDataGrid.Example.Pages
         {
             builder
                 .Property(p => p.Checkbox)
-                    .HasHeaderText("")
+                    .HasHeaderText("CB")
                     .HasWidth("50px")
                     .HasAutoEditor()
+                    .HasFixedCol()
+                    .HasBackgroundColor(System.Drawing.Color.White)
                 .Property(p => p.ActionHere)
                     .HasWidth("150px")
                 .Property(p => p.Name)
@@ -190,7 +192,7 @@ namespace BDataGrid.Example.Pages
                     Description = "sadadawd",
                     Value = 9
                 }
-            }).Take(5000).Append(new DataItem()
+            }).Take(2).Append(new DataItem()
             {
                 IsTotal = true
             }).ToList();

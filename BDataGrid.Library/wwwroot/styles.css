@@ -16,3 +16,19 @@
         animation-iteration-count: 6;
         animation-direction: alternate;
     }
+
+.fixedCol {
+    position: relative !important;
+    outline: rgba(34, 36, 38, 0.15) solid 1px;
+    background-color: inherit;
+    z-index: 10;
+}
+
+th.sorted.fixedCol {
+    background-color: #f9fafb !important;
+}
+
+th.fixedCol:hover {
+    background-color: #f9fafb !important;
+}
+

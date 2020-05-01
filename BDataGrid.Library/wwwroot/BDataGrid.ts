@@ -62,6 +62,9 @@ namespace BDataGrid {
         footerTable.parentElement.onscroll = function (sc) {
             headerTable.parentElement.scrollLeft = (this as any).scrollLeft;
             bodyTable.parentElement.scrollLeft = (this as any).scrollLeft;
+
+            let pos = (this as any).scrollLeft == 0 ? 0 : (this as any).scrollLeft - 1; // used to hide imperfection on the left side of the col
+            $(element).find('.fixedCol').css('left', pos + 'px');
         }
 
         if (!alreadyBinded) {

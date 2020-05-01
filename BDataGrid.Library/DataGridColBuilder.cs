@@ -142,5 +142,19 @@ namespace BDataGrid.Library
             return this;
         }
 
+        public DataGridColBuilder<TItem, TProperty> HasFixedCol()
+        {
+            AddAction(col => col.IsFixed = true);
+            HasClass("fixedCol");
+
+            return this;
+        }
+
+        public new DataGridColBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
+        {
+            AddAction((_, cell) => cell.BackgroundColor = color);
+            return this;
+        }
+
     }
 }
