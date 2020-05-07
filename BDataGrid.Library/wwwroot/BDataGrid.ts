@@ -58,13 +58,21 @@ namespace BDataGrid {
             else
                 clearInterval(interval);
         }, 500);
+        let blockScrollEvent = false;
 
-        footerTable.parentElement.onscroll = function (sc) {
+        footerTable.parentElement.onscroll = headerTable.parentElement.onscroll = bodyTable.parentElement.onscroll = function (sc) {
+            if (blockScrollEvent)
+                return;
+            blockScrollEvent = true;
+
+            footerTable.parentElement.scrollLeft = (this as any).scrollLeft;
             headerTable.parentElement.scrollLeft = (this as any).scrollLeft;
             bodyTable.parentElement.scrollLeft = (this as any).scrollLeft;
 
             let pos = (this as any).scrollLeft == 0 ? 0 : (this as any).scrollLeft - 1; // used to hide imperfection on the left side of the col
             $(element).find('.fixedCol').css('left', pos + 'px');
+
+            blockScrollEvent = false;
         }
 
         if (!alreadyBinded) {

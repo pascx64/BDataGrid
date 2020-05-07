@@ -44,11 +44,17 @@ var BDataGrid;
             else
                 clearInterval(interval);
         }, 500);
-        footerTable.parentElement.onscroll = function (sc) {
+        var blockScrollEvent = false;
+        footerTable.parentElement.onscroll = headerTable.parentElement.onscroll = bodyTable.parentElement.onscroll = function (sc) {
+            if (blockScrollEvent)
+                return;
+            blockScrollEvent = true;
+            footerTable.parentElement.scrollLeft = this.scrollLeft;
             headerTable.parentElement.scrollLeft = this.scrollLeft;
             bodyTable.parentElement.scrollLeft = this.scrollLeft;
             var pos = this.scrollLeft == 0 ? 0 : this.scrollLeft - 1; // used to hide imperfection on the left side of the col
             $(element).find('.fixedCol').css('left', pos + 'px');
+            blockScrollEvent = false;
         };
         if (!alreadyBinded) {
             alreadyBinded = true;
