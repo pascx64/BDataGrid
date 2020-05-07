@@ -1,8 +1,10 @@
 ﻿using BDataGrid.Library;
 using BDataGrid.Library.Formatters;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,7 +56,6 @@ namespace BDataGrid.Example.Pages
                     .HasWidth("100px")
                     .HasAppendedText("$")
                     .HasAutoEditor();
-
 
             builder.HasFilterRow();
 

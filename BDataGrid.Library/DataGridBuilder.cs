@@ -206,7 +206,7 @@ namespace BDataGrid.Library
             GlobalActions.Enqueue(action);
         }
 
-        public new DataGridColBuilder<TItem, TProperty> Property<TProperty>(System.Linq.Expressions.Expression<Func<TItem, TProperty>> selector)
+        public new DataGridColBuilder<TItem, TProperty> Property<TProperty>(Expression<Func<TItem, TProperty>> selector)
         {
             var cellBuilder = new DataGridColBuilder<TItem, TProperty>(selector, this);
 

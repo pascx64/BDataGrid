@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
-    public class DataGridCellBuilder<TItem, TProperty>
+    public class DataGridCellBuilder<TItem, TProperty> : DataGridCellBuilderGeneric<TItem>
         where TItem : class
     {
         protected Expression<Func<TItem, TProperty>> Selector { get; set; }
@@ -57,13 +57,12 @@ namespace BDataGrid.Library
         }
         private readonly Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>> Actions = new Queue<Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>>>();
 
-        public DataGridCellBuilder<TItem, TProperty> AddAction(Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>> action)
+        public override void AddAction(Action<DataGridRowInfo<TItem>, DataGridCellInfo<TItem>> action)
         {
             Actions.Enqueue(action);
-            return this;
         }
 
-        public virtual void ExecuteActions(DataGridRowInfo<TItem> rowInfo)
+        public override void ExecuteActions(DataGridRowInfo<TItem> rowInfo)
         {
             if (rowInfo.Cells == null)
                 rowInfo.Cells = new Dictionary<string, DataGridCellInfo<TItem>>();
@@ -129,52 +128,12 @@ namespace BDataGrid.Library
             return DataGridRowBuilder;
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasColSpan(int colspan)
+        internal override DataGridCellBuilderGeneric<TItem> HasAutoEditorGeneric()
         {
-            return AddAction((_, cell) => cell.ColSpan = colspan);
+            return HasAutoEditor();
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasClass(string classes, bool overrideExisting = true)
-        {
-            return AddAction((_, cell) => cell.Classes = overrideExisting ? classes : ((cell.Classes ?? "") + " " + classes).Trim());
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
-        {
-            return AddAction((_, cell) => cell.BackgroundColor = color);
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(string htmlColor)
-        {
-            return AddAction((_, cell) => cell.BackgroundColor = System.Drawing.ColorTranslator.FromHtml(htmlColor));
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> IsReadOnly()
-        {
-            return AddAction((_, cell) => cell.IsReadOnly = true);
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> IsNotReadOnly()
-        {
-            return AddAction((_, cell) => cell.IsReadOnly = false);
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> IsEditable()
-        {
-            return AddAction((_, cell) => cell.IsReadOnly = false);
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> ReplaceWith(string content = "")
-        {
-            return AddAction((_, cell) => cell.FormatterString = _ => content);
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> HasFormatter(Func<TItem, string> formatter)
-        {
-            return AddAction((_, cell) => cell.FormatterString = formatter);
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> HasAutoEditor()
+        public new DataGridCellBuilder<TItem, TProperty> HasAutoEditor()
         {
             var type = typeof(TProperty);
             var realType = type;
@@ -212,12 +171,13 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasEditor(Func<TItem, RenderFragment<DataGridEditorArgs>> renderFragmentProvider)
         {
-            return AddAction((row, cell) =>
+            AddAction((row, cell) =>
             {
                 if (cell.EditorInfo == null)
                     cell.EditorInfo = new DataGridEditorInfo<TItem>();
                 cell.EditorInfo.RenderFragmentProvider = renderFragmentProvider;
             });
+            return this;
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasEditor(Type editorType, Func<TItem, object>? argsProvider = null)
@@ -266,17 +226,13 @@ namespace BDataGrid.Library
             return HasEditor<Editors.BDataGridEditor_Text>();
         }
 
-        public DataGridCellBuilder<TItem, TProperty> HasAppendedText(string append)
-        {
-            return AddAction((row, cell) => cell.Append = append);
-        }
-
         public DataGridCellBuilder<TItem, TProperty> HasFormatter(RenderFragment<DataGridFormatterArgs> renderFragmentProvider)
         {
-            return AddAction((row, cell) =>
+            AddAction((row, cell) =>
             {
                 cell.Formatter = renderFragmentProvider;
             });
+            return this;
         }
 
         private RenderFragment<DataGridFormatterArgs> GetFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
@@ -306,7 +262,8 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
         {
-            return AddAction((row, cell) => cell.Formatter = GetFormatter(editorType, argsProvider));
+            AddAction((row, cell) => cell.Formatter = GetFormatter(editorType, argsProvider));
+            return this;
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasFormatter<TFormatter>(Func<TItem, object>? argsProvider = null)
@@ -339,7 +296,7 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasValidator(Func<TItem, TProperty, ValidationResult> validator)
         {
-            return AddAction((_, cell) =>
+            AddAction((_, cell) =>
             {
                 var previousValidator = cell.Validator;
                 cell.Validator = (item, obj) =>
@@ -354,6 +311,7 @@ namespace BDataGrid.Library
                     return validator(item, ConvertToProperty(obj));
                 };
             });
+            return this;
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasValidator(Func<TProperty, ValidationResult> validator)
@@ -363,31 +321,17 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilder<TItem, TProperty> HasNewValidator(Func<TItem, TProperty, ValidationResult>? validator)
         {
-            return AddAction((_, cell) =>
+            AddAction((_, cell) =>
             {
                 cell.Validator = validator == null ? null : (Func<TItem, object?, ValidationResult>?)((item, obj) => validator(item, ConvertToProperty(obj)));
             });
+            return this;
         }
 
         public DataGridCellBuilder<TItem, TProperty> HasNewValidator(Func<TProperty, ValidationResult>? validator)
         {
             return HasValidator((_, cell) => validator?.Invoke(cell) ?? new ValidationResult(true));
         }
-
-        public DataGridCellBuilder<TItem, TProperty> HasCellValueChangedCallback(Func<DataGridSelectedCellInfo<TItem>, Task>? onCellValueChanged)
-        {
-            AddAction((_, cell) => cell.OnCellValueChanged = onCellValueChanged);
-
-            return this;
-        }
-
-        public DataGridCellBuilder<TItem, TProperty> HasEditorValueConversion(Func<object?, EditorValueConversionResult>? editorValueConversion)
-        {
-            AddAction((_, cell) => cell.EditorValueConversion = editorValueConversion);
-
-            return this;
-        }
-
         private static TProperty ConvertToPropertyValue(object? obj)
         {
             var type = typeof(TProperty);
@@ -433,6 +377,85 @@ namespace BDataGrid.Library
                 returnValue = Activator.CreateInstance(type, returnValue);
 
             return (TProperty)returnValue;
+        }
+
+
+
+        public new DataGridCellBuilder<TItem, TProperty> HasColSpan(int colspan)
+        {
+            base.HasColSpan(colspan);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasClass(string classes, bool overrideExisting = true)
+        {
+            base.HasClass(classes, overrideExisting);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
+        {
+            base.HasBackgroundColor(color);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(string htmlColor)
+        {
+            base.HasBackgroundColor(htmlColor);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> IsReadOnly()
+        {
+            base.IsReadOnly();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> IsNotReadOnly()
+        {
+            base.IsNotReadOnly();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> IsEditable()
+        {
+            base.IsEditable();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> ReplaceWith(string content = "")
+        {
+            base.ReplaceWith(content);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasFormatter(Func<TItem, string> formatter)
+        {
+            base.HasFormatter(formatter);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasAppendedText(string append)
+        {
+            base.HasAppendedText(append);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasCellValueChangedCallback(Func<DataGridSelectedCellInfo<TItem>, Task>? onCellValueChanged)
+        {
+            base.HasCellValueChangedCallback(onCellValueChanged);
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasEditorValueConversion(Func<object?, EditorValueConversionResult>? editorValueConversion)
+        {
+            base.HasEditorValueConversion(editorValueConversion);
+            return this;
+        }
+
+        internal override DataGridCellBuilder<TItem, TProperty1> GetProperty<TProperty1>(Expression<Func<TItem, TProperty1>> selector)
+        {
+            return Property(selector);
         }
     }
 }

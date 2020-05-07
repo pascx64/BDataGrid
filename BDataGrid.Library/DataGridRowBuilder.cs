@@ -128,7 +128,7 @@ namespace BDataGrid.Library
 
         public DataGridRowBuilder<TItem> HasForcedRefresh(bool? value = true)
         {
-            AddAction( rowInfo => rowInfo.ForceRefresh = value);
+            AddAction(rowInfo => rowInfo.ForceRefresh = value);
 
             return this;
         }
@@ -139,5 +139,174 @@ namespace BDataGrid.Library
 
             return this;
         }
+
+
+
+
+        #region property groups
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<TProperty1>(Expression<Func<TItem, TProperty1>> property1)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1)
+            });
+        }
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<
+            TProperty1,
+            TProperty2>(
+            Expression<Func<TItem, TProperty1>> property1,
+            Expression<Func<TItem, TProperty2>> property2)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1),
+                 Property(property2),
+            });
+        }
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<
+            TProperty1,
+            TProperty2,
+            TProperty3>(
+            Expression<Func<TItem, TProperty1>> property1,
+            Expression<Func<TItem, TProperty2>> property2,
+            Expression<Func<TItem, TProperty3>> property3)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1),
+                 Property(property2),
+                 Property(property3),
+            });
+        }
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<
+            TProperty1,
+            TProperty2,
+            TProperty3,
+            TProperty4>(
+            Expression<Func<TItem, TProperty1>> property1,
+            Expression<Func<TItem, TProperty2>> property2,
+            Expression<Func<TItem, TProperty3>> property3,
+            Expression<Func<TItem, TProperty4>> property4)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1),
+                 Property(property2),
+                 Property(property3),
+                 Property(property4),
+            });
+        }
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<
+            TProperty1,
+            TProperty2,
+            TProperty3,
+            TProperty4,
+            TProperty5>(
+            Expression<Func<TItem, TProperty1>> property1,
+            Expression<Func<TItem, TProperty2>> property2,
+            Expression<Func<TItem, TProperty3>> property3,
+            Expression<Func<TItem, TProperty4>> property4,
+            Expression<Func<TItem, TProperty5>> property5)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1),
+                 Property(property2),
+                 Property(property3),
+                 Property(property4),
+                 Property(property5),
+            });
+        }
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<
+            TProperty1,
+            TProperty2,
+            TProperty3,
+            TProperty4,
+            TProperty5,
+            TProperty6>(
+            Expression<Func<TItem, TProperty1>> property1,
+            Expression<Func<TItem, TProperty2>> property2,
+            Expression<Func<TItem, TProperty3>> property3,
+            Expression<Func<TItem, TProperty4>> property4,
+            Expression<Func<TItem, TProperty5>> property5,
+            Expression<Func<TItem, TProperty6>> property6)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1),
+                 Property(property2),
+                 Property(property3),
+                 Property(property4),
+                 Property(property5),
+                 Property(property6),
+            });
+        }
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<
+            TProperty1,
+            TProperty2,
+            TProperty3,
+            TProperty4,
+            TProperty5,
+            TProperty6,
+            TProperty7>(
+            Expression<Func<TItem, TProperty1>> property1,
+            Expression<Func<TItem, TProperty2>> property2,
+            Expression<Func<TItem, TProperty3>> property3,
+            Expression<Func<TItem, TProperty4>> property4,
+            Expression<Func<TItem, TProperty5>> property5,
+            Expression<Func<TItem, TProperty6>> property6,
+            Expression<Func<TItem, TProperty7>> property7)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1),
+                 Property(property2),
+                 Property(property3),
+                 Property(property4),
+                 Property(property5),
+                 Property(property6),
+                 Property(property7),
+            });
+        }
+
+        public DataGridPropertyGroupBuilder<TItem> Properties<
+            TProperty1,
+            TProperty2,
+            TProperty3,
+            TProperty4,
+            TProperty5,
+            TProperty6,
+            TProperty7,
+            TProperty8>(
+            Expression<Func<TItem, TProperty1>> property1,
+            Expression<Func<TItem, TProperty2>> property2,
+            Expression<Func<TItem, TProperty3>> property3,
+            Expression<Func<TItem, TProperty4>> property4,
+            Expression<Func<TItem, TProperty5>> property5,
+            Expression<Func<TItem, TProperty6>> property6,
+            Expression<Func<TItem, TProperty7>> property7,
+            Expression<Func<TItem, TProperty8>> property8)
+        {
+            return new DataGridPropertyGroupBuilder<TItem>(new List<DataGridCellBuilderGeneric<TItem>>()
+            {
+                 Property(property1),
+                 Property(property2),
+                 Property(property3),
+                 Property(property4),
+                 Property(property5),
+                 Property(property6),
+                 Property(property7),
+                 Property(property8),
+            });
+        }
+
+        #endregion
     }
 }
