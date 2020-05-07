@@ -193,7 +193,7 @@ namespace BDataGrid.Example.Pages
                     Description = "sadadawd",
                     Value = 9
                 }
-            }).Take(2).Append(new DataItem()
+            }).Take(80000).Append(new DataItem()
             {
                 IsTotal = true
             }).ToList();
