@@ -1,4 +1,4 @@
-﻿using OfficeOpenXml;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -189,6 +189,11 @@ namespace BDataGrid.Library
 
 
             col.ValueSet(item, valueConverted);
+
+            rowInfo = GlobalRowInfo.Clone();
+            ExecuteActions(rowInfo, item);
+            var index = Items.IndexOf(item);
+            RowInfos_[index] = rowInfo;
 
             var selectedCell = new DataGridSelectedCellInfo<TItem>(item, col, rowInfo);
 

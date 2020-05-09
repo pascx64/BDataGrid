@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
@@ -211,7 +211,8 @@ namespace BDataGrid.Library
 
             if (!result.ChangesApplied)
                 _ = JSRuntime.InvokeVoidAsync("BDataGrid.editorError", ".selectedCell", result.ErrorMessage ?? "Error while applying value");
-
+            else
+                CloseEditor();
             return result.ChangesApplied;
         }
 

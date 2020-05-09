@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -49,6 +49,15 @@ namespace BDataGrid.Library
         }
 
         #endregion
+
+        public DataGridCellBuilder<TItem, TProperty> Property<TProperty>(string propertyName, Func<TItem, TProperty> selectorFun, Action<TItem, object?> setFunc)
+        {
+            var cellBuilder = new DataGridCellBuilder<TItem, TProperty>(propertyName, selectorFun, setFunc, this);
+
+            AddAction(cellBuilder.ExecuteActions);
+
+            return cellBuilder;
+        }
 
         public DataGridCellBuilder<TItem, TProperty> Property<TProperty>(Expression<Func<TItem, TProperty>> selector)
         {

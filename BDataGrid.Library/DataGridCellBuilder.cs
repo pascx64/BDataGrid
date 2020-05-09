@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -10,8 +10,6 @@ namespace BDataGrid.Library
     public class DataGridCellBuilder<TItem, TProperty> : DataGridCellBuilderGeneric<TItem>
         where TItem : class
     {
-        protected Expression<Func<TItem, TProperty>> Selector { get; set; }
-
         public string PropertyName { get; private set; }
 
         public DataGridRowBuilder<TItem> DataGridRowBuilder { get; }
@@ -23,16 +21,24 @@ namespace BDataGrid.Library
         public readonly Func<object?, TProperty> ConvertToProperty;
 
 
+        public DataGridCellBuilder(string propertyName, Func<TItem, TProperty> selectorFun, Action<TItem, object?> setFunc, DataGridRowBuilder<TItem> dataGridRowBuilder)
+        {
+            PropertyName = propertyName;
+            DataGridRowBuilder = DataGridRowBuilder;
+            SelectorFunc = selectorFun;
+            SetFunc = setFunc;
+            ConvertToProperty = ConvertToPropertyValue;
+        }
+
         public DataGridCellBuilder(Expression<Func<TItem, TProperty>> selector, DataGridRowBuilder<TItem> dataGridRowBuilder)
         {
-            Selector = selector;
             DataGridRowBuilder = dataGridRowBuilder;
 
-            SelectorFunc = Selector.Compile();
+            SelectorFunc = selector.Compile();
 
-            if (Selector.Body.NodeType == ExpressionType.MemberAccess)
+            if (selector.Body.NodeType == ExpressionType.MemberAccess)
             {
-                var memberExpression = (MemberExpression)Selector.Body;
+                var memberExpression = (MemberExpression)selector.Body;
 
                 if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
                 {
@@ -87,8 +93,9 @@ namespace BDataGrid.Library
         {
             var conditionalRowBuilder = DataGridRowBuilder.If(condition);
 
-            return conditionalRowBuilder.Property(Selector);
+            return conditionalRowBuilder.Property(PropertyName, SelectorFunc, SetFunc);
         }
+
         public DataGridRowBuilder<TItem> IfRow(Func<TItem, bool> condition)
         {
             return DataGridRowBuilder.If(condition);
@@ -104,15 +111,16 @@ namespace BDataGrid.Library
         {
             var conditionalRowBuilder = DataGridRowBuilder.ElseIf(condition);
 
-            return conditionalRowBuilder.Property(Selector);
+            return conditionalRowBuilder.Property(PropertyName, SelectorFunc, SetFunc);
         }
 
         public DataGridCellBuilder<TItem, TProperty> Else()
         {
             var conditionalRowBuilder = DataGridRowBuilder.Else();
 
-            return conditionalRowBuilder.Property(Selector);
+            return conditionalRowBuilder.Property(PropertyName, SelectorFunc, SetFunc);
         }
+
         public DataGridRowBuilder<TItem> ElseRow()
         {
             return DataGridRowBuilder.Else();
