@@ -24,7 +24,7 @@ namespace BDataGrid.Library
         public DataGridCellBuilder(string propertyName, Func<TItem, TProperty> selectorFun, Action<TItem, object?> setFunc, DataGridRowBuilder<TItem> dataGridRowBuilder)
         {
             PropertyName = propertyName;
-            DataGridRowBuilder = DataGridRowBuilder;
+            DataGridRowBuilder = dataGridRowBuilder;
             SelectorFunc = selectorFun;
             SetFunc = setFunc;
             ConvertToProperty = ConvertToPropertyValue;
@@ -245,11 +245,6 @@ namespace BDataGrid.Library
 
         private RenderFragment<DataGridFormatterArgs> GetFormatter(Type editorType, Func<TItem, object>? argsProvider = null)
         {
-            Func<TItem, object?, DataGridColInfo<TItem>, DataGridRowInfo<TItem>, DataGridCellInfo<TItem>, Task<DataGridAcceptChangesResult>> callback = (item, value, col, row, cell) =>
-            {
-                return DataGridRowBuilder.DataGridBuilder.TryAcceptChanges(item, value, col, row, cell);
-            };
-
             return args =>
             {
                 return builder =>
@@ -373,7 +368,7 @@ namespace BDataGrid.Library
             {
                 if (obj is bool b)
                     returnValue = b;
-                else if (obj is string str)
+                else if (obj is string)
                     returnValue = Convert.ChangeType(obj, realType);
                 else
                     throw new Exception("Cannot convert to bool from type:" + type);

@@ -299,8 +299,8 @@ namespace BDataGrid.Library
 
             var ws = p.Workbook.Worksheets.Add("Sheet");
 
-            ws.Cells[1, 2, 1, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-            ws.Cells[1, 2, 1, Columns.Count].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#5A5A5A"));
+            ws.Cells[1, 1, 1, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            ws.Cells[1, 1, 1, Columns.Count].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#5A5A5A"));
 
             int colIndex = 0;
             foreach (var col in Columns)
@@ -324,8 +324,8 @@ namespace BDataGrid.Library
 
                 if (rowStart % 2 == 0)
                 {
-                    ws.Cells[rowStart, colIndex, rowStart, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    ws.Cells[rowStart, colIndex, rowStart, Columns.Count].Style.Fill.BackgroundColor.SetColor(oddColor);
+                    ws.Cells[rowStart, 1, rowStart, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    ws.Cells[rowStart, 1, rowStart, Columns.Count].Style.Fill.BackgroundColor.SetColor(oddColor);
                 }
 
                 foreach (var col in Columns)
@@ -358,8 +358,8 @@ namespace BDataGrid.Library
                 }
             }
 
-            ws.Cells[1, 2, rowIndex, Columns.Count].AutoFilter = true;
-            ws.Cells[1, 2, rowIndex, Columns.Count].AutoFitColumns();
+            ws.Cells[1, 1, rowIndex, Columns.Count].AutoFilter = true;
+            ws.Cells[1, 1, rowIndex, Columns.Count].AutoFitColumns();
 
             p.SaveAs(outputStream);
         }
