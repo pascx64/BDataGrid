@@ -1,4 +1,4 @@
-﻿declare var $: any;
+declare var $: any;
 declare var Noty: any;
 
 namespace BDataGrid {
@@ -145,6 +145,11 @@ namespace BDataGrid {
             curColWidth = curCol.offsetWidth
             currentColIndex = index;
             currentDotNet = dotnet;
+
+            var diffX = e.pageX - pageX;
+            curCol.style.width = (curColWidth + diffX) + 'px';
+            curCol.style.minWidth = curCol.style.width;
+            curCol.style.maxWidth = curCol.style.width;
 
             e.preventDefault();
         });

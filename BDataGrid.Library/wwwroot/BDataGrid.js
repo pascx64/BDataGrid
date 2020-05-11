@@ -117,6 +117,10 @@ var BDataGrid;
             curColWidth = curCol.offsetWidth;
             currentColIndex = index;
             currentDotNet = dotnet;
+            var diffX = e.pageX - pageX;
+            curCol.style.width = (curColWidth + diffX) + 'px';
+            curCol.style.minWidth = curCol.style.width;
+            curCol.style.maxWidth = curCol.style.width;
             e.preventDefault();
         });
         div.onclick = function (ev) {

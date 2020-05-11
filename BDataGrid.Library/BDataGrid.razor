@@ -1,11 +1,11 @@
-﻿@typeparam TItem
+@typeparam TItem
 @inject IBDataGridStyle BDataGridStyle
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 <div @ref="TableRef" style="overflow: visible; width: @Width; height: @Height">
     <div style="height: calc(100% + @HeaderPadding); width: 100%; position: relative; display: flex; flex-direction: column">
 
         <div style="float: left; overflow:hidden; width: calc(100% - 10px); flex: none; padding-bottom: @HeaderPadding">
-            <table class="@(BDataGridStyle.TableClass)">
+            <table style="min-width: calc(@GetWidth()); max-width: calc(@GetWidth());" class="@(BDataGridStyle.TableClass)">
                 <thead class="@(BDataGridStyle.HeaderClass)">
                     <tr class="@(BDataGridStyle.HeaderRowClass)">
                         @foreach (var col in Builder.Columns)
@@ -51,7 +51,7 @@
         </div>
 
         <div style="float: left; height: 100%; width: inherit; overflow-y: scroll; overflow-x: hidden; position: relative; top: -@(HeaderPadding)">
-            <table class="@(BDataGridStyle.TableClass)">
+            <table style="min-width: calc(@GetWidth()); max-width: calc(@GetWidth());" class="@(BDataGridStyle.TableClass)">
 
                 <tbody>
 
@@ -71,7 +71,7 @@
         </div>
 
         <div style="float: left; width: calc(100% - 10px); overflow-x: auto; flex: none; position: relative; top: -@(HeaderPadding)">
-            <table class="@(BDataGridStyle.TableClass)">
+            <table style="min-width: calc(@GetWidth()); max-width: calc(@GetWidth());" class="@(BDataGridStyle.TableClass)">
                 <tfoot>
 
                     @for (int i = 0; i < Builder.FooterItems.Count; ++i)
@@ -136,3 +136,15 @@
         </div>
     </div>
 </div>
+
+@code {
+
+
+    private string GetWidth()
+    {
+        var allWidths = Builder.Columns.Select(col => col.Value.Width ?? ((100f / Builder.Columns.Count) + "%"));
+
+        return string.Join(" + ", allWidths);
+    }
+
+}
