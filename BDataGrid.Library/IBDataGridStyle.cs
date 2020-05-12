@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BDataGrid.Library
 {
@@ -35,6 +38,8 @@ namespace BDataGrid.Library
         string PaginationLeftIcon { get; set; }
 
         string PaginationRightIcon { get; set; }
+
+        string? PopupInitializationJavascriptFunction { get; set; }
 
     }
 }

@@ -47,6 +47,10 @@ namespace BDataGrid.Library
 
         public bool IsFixed { get; set; } = false;
 
+        public string? PopupTitle { get; set; } = null;
+
+        public string? PopupContent { get; set; } = null;
+
         public RenderFragment<BDataGrid<TItem>> FilterRenderFragment { get; set; }
 
         public Func<DataGridColInfo<TItem>, DataGridRowInfo<TItem>, TItem, FilterResult>? FilterMethod { get; set; }

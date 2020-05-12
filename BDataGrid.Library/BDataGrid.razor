@@ -16,7 +16,8 @@
                                  SortDirection.Ascending => BDataGridStyle.HeaderSortedAscendingClass,
                                  SortDirection.Descending => BDataGridStyle.HeaderSortedDescendingClass,
                                  _ => ""
-                             }) @(col.Value.IsFixed ? "fixedCol" : "")" style="width: @width; min-width: @width; max-width: @width; overflow: hidden; position: relative;">
+                             }) @(col.Value.IsFixed ? "fixedCol" : "")" style="width: @width; min-width: @width; max-width: @width; overflow: hidden; position: relative;"
+                                title="@col.Value.PopupTitle" data-content="@col.Value.PopupContent">
                                 @(col.Value.HeaderText ?? "Unknowned header")
                             </th>
                         }

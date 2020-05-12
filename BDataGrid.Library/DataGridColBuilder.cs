@@ -156,24 +156,43 @@ namespace BDataGrid.Library
             return this;
         }
 
-        public new DataGridCellBuilder<TItem, TProperty> HasLeftAlignedText()
+        public new DataGridColBuilder<TItem, TProperty> HasLeftAlignedText()
         {
             base.HasLeftAlignedText();
             return this;
         }
 
-        public new DataGridCellBuilder<TItem, TProperty> HasRightAlignedText()
+        public new DataGridColBuilder<TItem, TProperty> HasRightAlignedText()
         {
             base.HasRightAlignedText();
             return this;
         }
 
-        public new DataGridCellBuilder<TItem, TProperty> HasCenterAlignedText()
+        public new DataGridColBuilder<TItem, TProperty> HasCenterAlignedText()
         {
             base.HasCenterAlignedText();
             return this;
         }
 
+        public DataGridColBuilder<TItem, TProperty> HasPopup(string? title, string? content)
+        {
+            AddAction(col =>
+            {
+                col.PopupTitle = title;
+                col.PopupContent = content;
+            });
+            return this;
+        }
+
+        public DataGridColBuilder<TItem, TProperty> HasPopup(string content)
+        {
+            return HasPopup(null, content);
+        }
+
+        public DataGridColBuilder<TItem, TProperty> HasNoPopup()
+        {
+            return HasPopup(null, null);
+        }
 
     }
 }

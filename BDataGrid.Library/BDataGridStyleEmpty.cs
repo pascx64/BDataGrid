@@ -35,5 +35,7 @@ namespace BDataGrid.Library
         public string ExportExcelAClass { get; set; } = "";
 
         public string ExportExcelIconClass { get; set; } = "";
+
+        public string? PopupInitializationJavascriptFunction { get; set; } = null;
     }
 }

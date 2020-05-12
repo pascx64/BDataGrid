@@ -113,10 +113,16 @@ namespace BDataGrid.Library
             await base.OnAfterRenderAsync(firstRender);
 
             if (firstRender)
+            {
                 await JSRuntime.InvokeAsync<bool>("BDataGrid.initializeDatagrid", new object?[] { ThisReference = DotNetObjectReference.Create(this), TableRef });
+
+                if (BDataGridStyle.PopupInitializationJavascriptFunction != null && TableRef != null)
+                    await JSRuntime.InvokeVoidAsync(BDataGridStyle.PopupInitializationJavascriptFunction, TableRef);
+            }
 
             if (SelectedCell != null && TableRef != null && SelectedCellChangedSinceLastRefresh)
                 _ = TableRef.Value.FocusAsync(JSRuntime, ".selectedCell");
+
         }
 
         #region Sorting + selected cell
