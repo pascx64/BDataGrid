@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,6 +155,25 @@ namespace BDataGrid.Library
             AddAction((_, cell) => cell.BackgroundColor = color);
             return this;
         }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasLeftAlignedText()
+        {
+            base.HasLeftAlignedText();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasRightAlignedText()
+        {
+            base.HasRightAlignedText();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasCenterAlignedText()
+        {
+            base.HasCenterAlignedText();
+            return this;
+        }
+
 
     }
 }

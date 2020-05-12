@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,12 @@ namespace BDataGrid.Library
             return this;
         }
 
+        public DataGridCellBuilderGeneric<TItem> RemoveClass(string cssClass)
+        {
+            AddAction((_, cell) => cell.Classes = cell.Classes == null ? null : string.Join(' ', cell.Classes?.Split(' ').Where( x=> x == cssClass)));
+            return this;
+        }
+
         public DataGridCellBuilderGeneric<TItem> HasBackgroundColor(System.Drawing.Color color)
         {
             AddAction((_, cell) => cell.BackgroundColor = color);
@@ -45,6 +52,21 @@ namespace BDataGrid.Library
         {
             AddAction((_, cell) => cell.BackgroundColor = System.Drawing.ColorTranslator.FromHtml(htmlColor));
             return this;
+        }
+
+        public DataGridCellBuilderGeneric<TItem> HasLeftAlignedText()
+        {
+            return RemoveClass("rightAligned").RemoveClass("centerAligned").HasClass("leftAligned", false);
+        }
+
+        public DataGridCellBuilderGeneric<TItem> HasRightAlignedText()
+        {
+            return RemoveClass("leftAligned").RemoveClass("centerAligned").HasClass("rightAligned", false);
+        }
+
+        public DataGridCellBuilderGeneric<TItem> HasCenterAlignedText()
+        {
+            return RemoveClass("rightAligned").RemoveClass("leftAligned").HasClass("centerAligned", false);
         }
 
         public DataGridCellBuilderGeneric<TItem> IsReadOnly()

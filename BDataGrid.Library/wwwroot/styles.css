@@ -1,4 +1,4 @@
-﻿
+
 @keyframes BDataGridBlinkError {
     50% {
         outline-color: #ff0000;
@@ -32,3 +32,14 @@ th.fixedCol:hover {
     background-color: #f9fafb !important;
 }
 
+.leftAligned {
+    text-align: left !important;
+}
+
+.centerAligned {
+    text-align: center !important;
+}
+
+.rightAligned {
+    text-align: right !important;
+}

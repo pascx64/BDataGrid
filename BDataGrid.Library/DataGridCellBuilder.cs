@@ -396,6 +396,30 @@ namespace BDataGrid.Library
             return this;
         }
 
+        public new DataGridCellBuilder<TItem, TProperty> HasLeftAlignedText()
+        {
+            base.HasLeftAlignedText();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasRightAlignedText()
+        {
+            base.HasRightAlignedText();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> HasCenterAlignedText()
+        {
+            base.HasCenterAlignedText();
+            return this;
+        }
+
+        public new DataGridCellBuilder<TItem, TProperty> RemoveClass(string cssClass)
+        {
+            base.RemoveClass(cssClass);
+            return this;
+        }
+
         public new DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
         {
             base.HasBackgroundColor(color);
