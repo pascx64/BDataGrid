@@ -194,6 +194,7 @@ namespace BDataGrid.Library
             ExecuteActions(rowInfo, item);
             var index = Items.IndexOf(item);
             RowInfos_[index] = rowInfo;
+            rowInfo.Cells?.TryGetValue(col.Id, out cellInfo);
 
             var selectedCell = new DataGridSelectedCellInfo<TItem>(item, col, rowInfo);
 
