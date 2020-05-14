@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BDataGrid.Library
 {
@@ -17,6 +17,8 @@ namespace BDataGrid.Library
         {
             if (Condition(item))
                 return ExecuteActions(rowInfo, item);
+            else if (Alternative is DataGridRowBuilderConditional<TItem> otherConditional)
+                return otherConditional.ExecuteConditional(rowInfo, item);
             else if (Alternative != null)
                 return Alternative.ExecuteActions(rowInfo, item);
 
