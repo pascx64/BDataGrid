@@ -238,6 +238,8 @@ namespace BDataGrid.Library
             CurrentEditorRenderFragment = null;
 
             _ = JSRuntime.InvokeVoidAsync("BDataGrid.switchEditionMode", TableRef, false);
+
+            StateHasChanged();
         }
 
         public async Task OpenEditor(TItem item, DataGridColInfo<TItem> col, string? firstCharacter = null)

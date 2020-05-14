@@ -1,0 +1,91 @@
+@inherits BDataGridEditorBase
+@using Microsoft.JSInterop;
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<input type="text" @ref="Ref" @oninput="x => OnInput(x.Value?.ToString())" @onkeydown="OnKeyDown" @onclick:preventDefault="true" @onclick:stopPropagation="true"
+       style="width: 100%; border: transparent !important; background: transparent; height: 100%; outline: transparent;" />
+
+@code {
+    public string Text { get; set; } = "";
+
+    private ElementReference Ref { get; set; }
+
+    private DotNetObjectReference<BDataGridEditor_Date> DotNetRef { get; set; }
+
+    private async Task OnKeyDown(KeyboardEventArgs ev)
+    {
+        if (ev.Key == "Enter")
+            await OnPickerClosedFromClient();
+    }
+
+    [JSInvokable]
+    public async Task OnInputFromClient(string? text)
+    {
+        Text = text ?? "";
+        await OnPickerClosedFromClient();
+    }
+    [JSInvokable]
+    public void OnInput(string? text)
+    {
+        Text = text ?? "";
+    }
+    public async Task OnPickerClosedFromClient()
+    {
+        if (DateTime.TryParseExact(Text, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime newDate))
+        {
+            await Args.TryAcceptChanges(newDate);
+            StateHasChanged();
+        }
+        else if (string.IsNullOrEmpty(Text))
+        {
+            await Args.TryAcceptChanges(null);
+            StateHasChanged();
+        }
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            // this is done in the After Render so that we only do it in the firstRender
+
+            if (Args.FirstCharacter != null)
+                Text = Args.FirstCharacter;
+            else if (Args.Value is string str)
+                Text = str;
+            else if (Args.Value is DateTime date)
+                Text = date.ToString("yyyy-MM-dd");
+            else if (Args.Value is DateTime?)
+                Text = ((DateTime?)Args.Value)?.ToString("yyyy-MM-dd") ?? "";
+            else
+                Text = Args.Value?.ToString() ?? "";
+
+            Args.ForceAccept = async () =>
+            {
+                if (DateTime.TryParseExact(Text, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime newDate))
+                    await Args.TryAcceptChanges(newDate);
+                else if (string.IsNullOrEmpty(Text))
+                    await Args.TryAcceptChanges(null);
+                else
+                {
+                    await Args.CancelAndCloseEditor.InvokeAsync(false);
+                    return false;
+                }
+
+                return true;
+            };
+
+            StateHasChanged();
+
+            _ = Ref.FocusAsync(JSRuntime);
+            JSRuntime.InvokeAsync<bool>("BDataGrid.initializeJqueryDatePicker", new object[] { Ref, Text, DotNetRef = DotNetObjectReference.Create(this) });
+        }
+    }
+
+    public void Dispose()
+    {
+        DotNetRef.Dispose();
+    }
+}

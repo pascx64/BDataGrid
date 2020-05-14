@@ -151,6 +151,8 @@ namespace BDataGrid.Library
 
             if (realType == typeof(string))
                 return HasEditor<Editors.BDataGridEditor_Text>();
+            if (realType == typeof(DateTime) || realType == typeof(DateTime?))
+                return HasEditor<Editors.BDataGridEditor_Date>();
             if (realType == typeof(float) || realType == typeof(double) || realType == typeof(int) || realType == typeof(uint) || realType == typeof(decimal)
                 || realType == typeof(short) || realType == typeof(byte) || realType == typeof(long) || realType == typeof(ulong)
                 || realType == typeof(bool))

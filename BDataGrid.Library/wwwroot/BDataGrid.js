@@ -169,5 +169,18 @@ var BDataGrid;
         }).show();
     }
     BDataGrid.editorError = editorError;
+    function initializeJqueryDatePicker(element, text, dotnetRef) {
+        element.value = text;
+        $(element).datepicker({
+            dayNames: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+            dateFormat: "yy-mm-dd"
+        });
+        $(element).datepicker("show");
+        $(element).change(function () {
+            dotnetRef.invokeMethodAsync("OnInputFromClient", element.value);
+        });
+        return true;
+    }
+    BDataGrid.initializeJqueryDatePicker = initializeJqueryDatePicker;
 })(BDataGrid || (BDataGrid = {}));
 //# sourceMappingURL=BDataGrid.js.map
