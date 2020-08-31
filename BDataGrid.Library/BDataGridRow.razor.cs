@@ -6,7 +6,7 @@ using System.Text;
 namespace BDataGrid.Library
 {
     public partial class BDataGridRow<TItem> : ComponentBase
-        where TItem : class
+        where TItem : BDataGridItem<TItem>
     {
     }
 }

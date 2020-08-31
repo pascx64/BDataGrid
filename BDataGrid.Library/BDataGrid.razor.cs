@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace BDataGrid.Library
 {
     public partial class BDataGrid<TItem> : ComponentBase, IDisposable
-        where TItem : class
+        where TItem : BDataGridItem<TItem>
     {
         [Parameter]
         public string TableCssClass { get; set; } = "";
