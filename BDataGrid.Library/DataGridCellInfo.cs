@@ -48,6 +48,8 @@ namespace BDataGrid.Library
     {
         public System.Drawing.Color? BackgroundColor { get; set; }
 
+        public bool DoNotExportBackgroundColor { get; set; }
+
         public string? Classes { get; set; }
 
         public int? ColSpan { get; set; }

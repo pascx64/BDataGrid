@@ -422,15 +422,15 @@ namespace BDataGrid.Library
             return this;
         }
 
-        public new DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
+        public new DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color, bool? doNotExportToExcel = null)
         {
-            base.HasBackgroundColor(color);
+            base.HasBackgroundColor(color, doNotExportToExcel);
             return this;
         }
 
-        public new DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(string htmlColor)
+        public new DataGridCellBuilder<TItem, TProperty> HasBackgroundColor(string htmlColor, bool? doNotExportToExcel = null)
         {
-            base.HasBackgroundColor(htmlColor);
+            base.HasBackgroundColor(htmlColor, doNotExportToExcel);
             return this;
         }
 

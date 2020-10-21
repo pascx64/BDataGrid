@@ -146,13 +146,19 @@ namespace BDataGrid.Library
         {
             AddAction(col => col.IsFixed = true);
             HasClass("fixedCol");
+            HasBackgroundColor(System.Drawing.Color.White, true);
 
             return this;
         }
 
-        public new DataGridColBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color)
+        public new DataGridColBuilder<TItem, TProperty> HasBackgroundColor(System.Drawing.Color color, bool? doNotExportToExcel = null)
         {
-            AddAction((_, cell) => cell.BackgroundColor = color);
+            AddAction((_, cell) =>
+            {
+                cell.BackgroundColor = color;
+                if (doNotExportToExcel != null)
+                    cell.DoNotExportBackgroundColor = doNotExportToExcel.Value;
+            });
             return this;
         }
 

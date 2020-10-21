@@ -351,7 +351,7 @@ namespace BDataGrid.Library
 
                     excelCell.Merge = true;
 
-                    if (cellInfo?.BackgroundColor != null)
+                    if (cellInfo?.BackgroundColor != null && !cellInfo.DoNotExportBackgroundColor)
                     {
                         excelCell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                         excelCell.Style.Fill.BackgroundColor.SetColor(cellInfo.BackgroundColor.Value);

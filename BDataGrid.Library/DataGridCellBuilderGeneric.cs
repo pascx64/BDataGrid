@@ -38,20 +38,25 @@ namespace BDataGrid.Library
 
         public DataGridCellBuilderGeneric<TItem> RemoveClass(string cssClass)
         {
-            AddAction((_, cell) => cell.Classes = cell.Classes == null ? null : string.Join(' ', cell.Classes?.Split(' ').Where( x=> x == cssClass)));
+            AddAction((_, cell) => cell.Classes = cell.Classes == null ? null : string.Join(' ', cell.Classes?.Split(' ').Where(x => x == cssClass)));
             return this;
         }
 
-        public DataGridCellBuilderGeneric<TItem> HasBackgroundColor(System.Drawing.Color color)
+        public DataGridCellBuilderGeneric<TItem> HasBackgroundColor(System.Drawing.Color color, bool? doNotExportToExcel = null)
         {
-            AddAction((_, cell) => cell.BackgroundColor = color);
+            AddAction((_, cell) =>
+            {
+                cell.BackgroundColor = color;
+
+                if (doNotExportToExcel != null)
+                    cell.DoNotExportBackgroundColor = doNotExportToExcel.Value;
+            });
             return this;
         }
 
-        public DataGridCellBuilderGeneric<TItem> HasBackgroundColor(string htmlColor)
+        public DataGridCellBuilderGeneric<TItem> HasBackgroundColor(string htmlColor, bool? doNotExportToExcel = null)
         {
-            AddAction((_, cell) => cell.BackgroundColor = System.Drawing.ColorTranslator.FromHtml(htmlColor));
-            return this;
+            return HasBackgroundColor(System.Drawing.ColorTranslator.FromHtml(htmlColor), doNotExportToExcel);
         }
 
         public DataGridCellBuilderGeneric<TItem> HasLeftAlignedText()
@@ -119,6 +124,6 @@ namespace BDataGrid.Library
             return this;
         }
 
-        
+
     }
 }
