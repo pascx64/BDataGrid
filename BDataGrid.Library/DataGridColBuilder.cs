@@ -65,6 +65,11 @@ namespace BDataGrid.Library
             return AddAction(c => c.Width = width);
         }
 
+        public DataGridColBuilder<TItem, TProperty> HasSortingDirection(SortDirection? sortDirection)
+        {
+            return AddAction(c => c.CurrentSortDirection = sortDirection);
+        }
+
         public DataGridColBuilder<TItem, TProperty> HasHeaderText(string text)
         {
             return AddAction(c => c.HeaderText = text);
