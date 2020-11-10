@@ -31,6 +31,12 @@ namespace BDataGrid.Library
         }
 
         [Parameter]
+        public TimeSpan RenderDelay { get; set; } = TimeSpan.FromMilliseconds(100);
+
+        [Parameter]
+        public int InitialRenderSize { get; set; } = 10;
+
+        [Parameter]
         public Action<DataGridBuilder<TItem>> Configure { get; set; }
 
         [Parameter]
@@ -70,6 +76,8 @@ namespace BDataGrid.Library
         public string HeaderPadding { get; set; } = "2000px";
 
         public int CurrentTotalPages => (int)Math.Ceiling(Builder.FilteredItems.Count / (float)PageSize);
+
+        public int CurrentPageSize => Builder.FilteredItems.Count == 0 ? 0 : Builder.FilteredItems.Count % PageSize;
 
         private int CurrentPage_ = 0;
         public int CurrentPage
@@ -121,7 +129,10 @@ namespace BDataGrid.Library
             }
 
             if (SelectedCell != null && TableRef != null && SelectedCellChangedSinceLastRefresh)
+            {
+                SelectedCellChangedSinceLastRefresh = false;
                 _ = TableRef.Value.FocusAsync(JSRuntime, ".selectedCell");
+            }
 
         }
 

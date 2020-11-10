@@ -1,60 +1,67 @@
-﻿@typeparam TItem
+@typeparam TItem
 @inject IBDataGridStyle BDataGridStyle;
 
-<tr style="@(RowInfo.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(RowInfo.BackgroundColor.Value))"
+@{
+    var shouldRenderCols = RowVisualIndex <= InitialRenderSize || ShouldRenderCols;
+}
+
+<tr style="@(RowInfo.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(RowInfo.BackgroundColor.Value) + ";") @(shouldRenderCols ? "" : "height: 26px;")"
     class="@(RowInfo.Classes ?? "") @(BDataGridStyle.RowClass)">
 
     @{
-        int colspanToSkip = 1;
-        int colIndex = -1;
-        foreach (var col in DataGrid.Builder.Columns)
+        if (shouldRenderCols)
         {
-            ++colIndex;
-            if (colspanToSkip > 1)
+            int colspanToSkip = 1;
+            int colIndex = -1;
+            foreach (var col in DataGrid.Builder.Columns)
             {
-                --colspanToSkip;
-                continue;
-            }
+                ++colIndex;
+                if (colspanToSkip > 1)
+                {
+                    --colspanToSkip;
+                    continue;
+                }
 
-            DataGridCellInfo<TItem>? cellInfo = null;
-            if (RowInfo.Cells != null)
-                RowInfo.Cells.TryGetValue(col.Key, out cellInfo);
+                DataGridCellInfo<TItem>? cellInfo = null;
+                if (RowInfo.Cells != null)
+                    RowInfo.Cells.TryGetValue(col.Key, out cellInfo);
 
-            colspanToSkip = cellInfo?.ColSpan ?? 1;
+                colspanToSkip = cellInfo?.ColSpan ?? 1;
 
-            var isSelectedCell = DataGrid.SelectedCell?.Col == col.Value && DataGrid.SelectedCell?.Item == Item;
-            var width = @GetWidth(colIndex, colspanToSkip, col.Value);
-            var isInEdit = isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null;
+                var isSelectedCell = DataGrid.SelectedCell?.Col == col.Value && DataGrid.SelectedCell?.Item == Item;
+                var width = @GetWidth(colIndex, colspanToSkip, col.Value);
+                var isInEdit = isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null;
 
-            <td tabindex="0" colspan="@colspanToSkip.ToString()"
-                style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value));
+                <td tabindex="0" colspan="@colspanToSkip.ToString()"
+                    style="@(cellInfo?.BackgroundColor == null ? "" : "background-color:" + System.Drawing.ColorTranslator.ToHtml(cellInfo.BackgroundColor.Value));
                 width: calc(@width); min-width: calc(@width); max-width: calc(@width);"
-                class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
-                @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
-                @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
+                    class="@(BDataGridStyle.CellClass) @(cellInfo?.Classes ?? "") @(isSelectedCell ? BDataGridStyle.SelectedCell + " selectedCell" : "")"
+                    @onclick="() => DataGrid.SelectedCellFromClient(Item, col.Value, true)"
+                    @ondblclick="() => DataGrid.OpenEditor(Item, col.Value)">
 
-                <div style="display: block; max-height: 50px; overflow: @(isInEdit ? "visible" : "auto")">
-                    @if (isInEdit)
-                    {
-                        @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);
-                    }
-                    else if (cellInfo?.Formatter != null)
-                    {
-                        @cellInfo.Formatter(new DataGridFormatterArgs()
+                    <div style="display: block; max-height: 50px; overflow: @(isInEdit ? "visible" : "auto")">
+                        @if (isInEdit)
                         {
-                            Value = col.Value.ValueSelector(Item),
-                            Item = Item,
-                            IsReadOnly = cellInfo?.IsReadOnly ?? RowInfo.IsReadOnly ?? true,
-                            AcceptNewValue = new EventCallback<object?>(DataGrid, (Func<object?, Task<bool>>)(v => DataGrid.TryAcceptChangesFromFormatter(Item, v, col.Value, RowInfo, cellInfo)))
-                        })
-                    }
-                    else
-                    {
-                        @((cellInfo?.FormatterString ?? col.Value.Formatter)(Item))@(cellInfo?.Append ?? "")
-                    }
-                </div>
+                            @DataGrid.CurrentEditorRenderFragment(DataGrid.CurrentEditor);
+                        }
+                        else if (cellInfo?.Formatter != null)
+                        {
+                            @cellInfo.Formatter(new DataGridFormatterArgs()
+                            {
+                                Value = col.Value.ValueSelector(Item),
+                                Item = Item,
+                                IsReadOnly = cellInfo?.IsReadOnly ?? RowInfo.IsReadOnly ?? true,
+                                AcceptNewValue = new EventCallback<object?>(DataGrid, (Func<object?, Task<bool>>)(v => DataGrid.TryAcceptChangesFromFormatter(Item, v, col.Value, RowInfo, cellInfo)))
+                            })
+                        }
+                        else
+                        {
+                            @((cellInfo?.FormatterString ?? col.Value.Formatter)(Item))@(cellInfo?.Append ?? "")
+                        }
+                    </div>
 
-            </td>
+                </td>
+            }
         }
     }
 
@@ -96,6 +103,30 @@
         }
     }
 
+    private bool ShouldRenderCols_;
+    [Parameter]
+    public bool ShouldRenderCols
+    {
+        get => ShouldRenderCols_;
+        set
+        {
+            if (ShouldRenderCols_ != value)
+            {
+                ShouldRenderCols_ = value;
+                ShouldRefresh = true;
+            }
+        }
+    }
+
+    [Parameter]
+    public int RowVisualIndex { get; set; }
+
+    [Parameter]
+    public TimeSpan RenderDelay { get; set; } = TimeSpan.FromMilliseconds(100);
+
+    [Parameter]
+    public int InitialRenderSize { get; set; } = 20;
+
     private TItem Item_;
     [Parameter]
     public TItem Item
@@ -129,11 +160,28 @@
         base.OnParametersSet();
     }
 
+    private bool WaitingToRenderCols = false;
     protected override void OnAfterRender(bool firstRender)
     {
         ShouldRefresh = false;
 
         base.OnAfterRender(firstRender);
+
+
+        if (!ShouldRenderCols && !WaitingToRenderCols && RowVisualIndex > InitialRenderSize)
+        {
+            WaitingToRenderCols = true;
+            InvokeAsync(async () =>
+            {
+                await System.Threading.Tasks.Task.Delay(RenderDelay * (RowVisualIndex - InitialRenderSize + 1));
+
+                ShouldRenderCols = true;
+                ShouldRefresh = true;
+
+                StateHasChanged();
+            });
+        }
+
     }
 
     protected override bool ShouldRender()

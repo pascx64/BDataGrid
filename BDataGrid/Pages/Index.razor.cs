@@ -19,6 +19,30 @@ namespace BDataGrid.Example.Pages
             public string Name { get; set; }
 
             public string Description { get; set; }
+            public string Description2 { get; set; } = new Random().Next().ToString();
+            public string Description3 { get; set; } = new Random().Next().ToString();
+            public string Description4 { get; set; } = new Random().Next().ToString();
+            public string Description5 { get; set; } = new Random().Next().ToString();
+            public string Description6 { get; set; } = new Random().Next().ToString();
+            public string Description7 { get; set; } = new Random().Next().ToString();
+            public string Description8 { get; set; } = new Random().Next().ToString();
+            public string Description9 { get; set; } = new Random().Next().ToString();
+            public string Description12 { get; set; } = new Random().Next().ToString();
+            public string Description13 { get; set; } = new Random().Next().ToString();
+            public string Description14 { get; set; } = new Random().Next().ToString();
+            public string Description15 { get; set; } = new Random().Next().ToString();
+            public string Description16 { get; set; } = new Random().Next().ToString();
+            public string Description17 { get; set; } = new Random().Next().ToString();
+            public string Description18 { get; set; } = new Random().Next().ToString();
+            public string Description19 { get; set; } = new Random().Next().ToString();
+            public string Description22 { get; set; } = new Random().Next().ToString();
+            public string Description23 { get; set; } = new Random().Next().ToString();
+            public string Description24 { get; set; } = new Random().Next().ToString();
+            public string Description25 { get; set; } = new Random().Next().ToString();
+            public string Description26 { get; set; } = new Random().Next().ToString();
+            public string Description27 { get; set; } = new Random().Next().ToString();
+            public string Description28 { get; set; } = new Random().Next().ToString();
+            public string Description29 { get; set; } = new Random().Next().ToString();
 
             [DataGridColumnInfo(AllowEdit = true)]
             public float Value { get; set; }
@@ -52,6 +76,30 @@ namespace BDataGrid.Example.Pages
                 .Property(p => p.Description)
                     .HasHeaderText("Description")
                     .HasWidth("500px")
+                .Property(p => p.Description2).HasHeaderText("Description2")
+                .Property(p => p.Description3).HasHeaderText("Description3")
+                .Property(p => p.Description4).HasHeaderText("Description4")
+                .Property(p => p.Description5).HasHeaderText("Description5")
+                .Property(p => p.Description6).HasHeaderText("Description6")
+                .Property(p => p.Description7).HasHeaderText("Description7")
+                .Property(p => p.Description8).HasHeaderText("Description8")
+                .Property(p => p.Description9).HasHeaderText("Description9")
+                .Property(p => p.Description12).HasHeaderText("Description12")
+                .Property(p => p.Description13).HasHeaderText("Description13")
+                .Property(p => p.Description14).HasHeaderText("Description14")
+                .Property(p => p.Description15).HasHeaderText("Description15")
+                .Property(p => p.Description16).HasHeaderText("Description16")
+                .Property(p => p.Description17).HasHeaderText("Description17")
+                .Property(p => p.Description18).HasHeaderText("Description18")
+                .Property(p => p.Description19).HasHeaderText("Description19")
+                .Property(p => p.Description22).HasHeaderText("Description22")
+                .Property(p => p.Description23).HasHeaderText("Description23")
+                .Property(p => p.Description24).HasHeaderText("Description24")
+                .Property(p => p.Description25).HasHeaderText("Description25")
+                .Property(p => p.Description26).HasHeaderText("Description26")
+                .Property(p => p.Description27).HasHeaderText("Description27")
+                .Property(p => p.Description28).HasHeaderText("Description28")
+                .Property(p => p.Description29).HasHeaderText("Description29")
                 .Property(p => p.Value)
                     .HasHeaderText("Value")
                     .HasWidth("100px")
@@ -81,7 +129,7 @@ namespace BDataGrid.Example.Pages
                             .EndIf()
                         .Property(p => p.Description)
                             .HasClass("warning")
-                        .Property( p => p.Checkbox )
+                        .Property(p => p.Checkbox)
                             .IsNotReadOnly()
                     .ElseRow()
                         .Property(p => p.Description)
@@ -195,7 +243,7 @@ namespace BDataGrid.Example.Pages
                     Description = "sadadawd",
                     Value = 9
                 }
-            }).Take(80000).Append(new DataItem()
+            }).Take(80100).Append(new DataItem()
             {
                 IsTotal = true
             }).ToList();
