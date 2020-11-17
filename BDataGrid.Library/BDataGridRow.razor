@@ -29,7 +29,7 @@
                 colspanToSkip = cellInfo?.ColSpan ?? 1;
 
                 var isSelectedCell = DataGrid.SelectedCell?.Col == col.Value && DataGrid.SelectedCell?.Item == Item;
-                var width = @GetWidth(colIndex, colspanToSkip, col.Value);
+                var width = GetWidth(colIndex, colspanToSkip, col.Value);
                 var isInEdit = isSelectedCell && DataGrid.CurrentEditor != null && DataGrid.CurrentEditorRenderFragment != null;
 
                 <td tabindex="0" colspan="@colspanToSkip.ToString()"

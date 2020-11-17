@@ -1,7 +1,7 @@
-﻿@inherits BDataGridEditorBase
+@inherits BDataGridEditorBase
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
-<input @ref="Ref" @bind-value="Text" @bind-value:event="oninput" @onkeydown="OnKeyDown" @onclick:preventDefault="true" @onclick:stopPropagation="true"
+<input @ref="Ref" @bind-value="Text" @bind-value:event="oninput" @onkeydown="OnKeyDown" @onclick:preventDefault="true" @onclick:stopPropagation="true" @onfocusout="OnFocusOut"
        style="width: 100%; border: transparent !important; background: transparent; height: 100%; outline: transparent;" />
 
 @code {
@@ -13,6 +13,11 @@
     {
         if (ev.Key == "Enter")
             await Args.TryAcceptChanges(Text);
+    }
+
+    private async Task OnFocusOut()
+    {
+        await Args.TryAcceptChanges(Text);
     }
 
     protected override void OnAfterRender(bool firstRender)

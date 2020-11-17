@@ -171,6 +171,8 @@ namespace BDataGrid.Library
                 });
                 if (realType != typeof(bool))
                     return HasEditor<Editors.BDataGridEditor_Text>();
+                else
+                    AddAction((row, cell) => cell.IsReadOnly = false);
 
                 return this;
             }

@@ -229,7 +229,10 @@ namespace BDataGrid.Library
             if (!result.ChangesApplied)
                 _ = JSRuntime.InvokeVoidAsync("BDataGrid.editorError", ".selectedCell", result.ErrorMessage ?? "Error while applying value");
             else
+            {
                 CloseEditor();
+                _ = TableRef.Value.FocusAsync(JSRuntime, ".selectedCell");
+            }
             return result.ChangesApplied;
         }
 
