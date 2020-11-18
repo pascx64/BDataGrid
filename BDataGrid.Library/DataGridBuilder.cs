@@ -221,6 +221,15 @@ namespace BDataGrid.Library
             return cellBuilder;
         }
 
+        public new DataGridColBuilder<TItem, TProperty> Property<TProperty>(string propertyName, Func<TItem, TProperty> selectorFun, Action<TItem, object?> setFunc)
+        {
+            var colBuilder = new DataGridColBuilder<TItem, TProperty>(propertyName, selectorFun, setFunc, this);
+
+            AddAction(colBuilder.ExecuteActions);
+
+            return colBuilder;
+        }
+
         public DataGridBuilder<TItem> HasFilterRow()
         {
             AddAction(row => ShowHeaderFilters = true);

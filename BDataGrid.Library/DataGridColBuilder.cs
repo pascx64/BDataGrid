@@ -13,7 +13,16 @@ namespace BDataGrid.Library
         private readonly DataGridBuilder<TItem> GridBuilder;
 
 
-        public DataGridColBuilder(Expression<Func<TItem, TProperty>> selector, DataGridRowBuilder<TItem> dataGridRowBuilder) : base(selector, dataGridRowBuilder)
+        public DataGridColBuilder(Expression<Func<TItem, TProperty>> selector, DataGridRowBuilder<TItem> dataGridRowBuilder)
+            : base(selector, dataGridRowBuilder)
+        {
+            if (dataGridRowBuilder is DataGridBuilder<TItem> gridBuilder)
+                GridBuilder = gridBuilder;
+            else
+                throw new Exception("Cannot create col builder any builder except the main grid builder");
+        }
+        public DataGridColBuilder(string propertyName, Func<TItem, TProperty> selectorFun, Action<TItem, object?> setFunc, DataGridRowBuilder<TItem> dataGridRowBuilder)
+            : base(propertyName, selectorFun, setFunc, dataGridRowBuilder)
         {
             if (dataGridRowBuilder is DataGridBuilder<TItem> gridBuilder)
                 GridBuilder = gridBuilder;
