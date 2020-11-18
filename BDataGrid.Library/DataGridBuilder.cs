@@ -323,11 +323,11 @@ namespace BDataGrid.Library
                 colIndex = 0;
                 var rowStart = ++rowIndex;
 
-                if (rowStart % 2 == 0)
-                {
-                    ws.Cells[rowStart, 1, rowStart, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    ws.Cells[rowStart, 1, rowStart, Columns.Count].Style.Fill.BackgroundColor.SetColor(oddColor);
-                }
+                //if (rowStart % 2 == 0)
+                //{
+                //    ws.Cells[rowStart, 1, rowStart, Columns.Count].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                //    ws.Cells[rowStart, 1, rowStart, Columns.Count].Style.Fill.BackgroundColor.SetColor(oddColor);
+                //}
 
                 foreach (var col in Columns)
                 {
