@@ -9,15 +9,18 @@
 
     private ElementReference Ref { get; set; }
 
+    private bool AlreadyAcceptedChanges { get; set; }
+
     private async Task OnKeyDown(KeyboardEventArgs ev)
     {
         if (ev.Key == "Enter")
-            await Args.TryAcceptChanges(Text);
+            AlreadyAcceptedChanges = await Args.TryAcceptChanges(Text);
     }
 
     private async Task OnFocusOut()
     {
-        await Args.TryAcceptChanges(Text);
+        if( !AlreadyAcceptedChanges)
+            await Args.TryAcceptChanges(Text);
     }
 
     protected override void OnAfterRender(bool firstRender)
